@@ -137,7 +137,7 @@ class LEG:
         self.hedge.type = self.type
         self.hedge.exp_date = self.exp_date
         if hedgeDist > 10:
-            hedgestrike = str(round((int(self.Strike) + hedgeDist * self.shift) / 500) * 500)
+            hedgestrike = str(round((int(self.Strike) + hedgeDist * self.shift) / 100) * 100)
         else:
             hedgestrike = str(int(self.Strike) + hedgeDist * self.shift)
         symbol = index + self.exp_date + hedgestrike + self.type
@@ -161,4 +161,4 @@ class LEG:
         map = {"O": 10, "N": 11, "D": 12}
         m = int(self.exp_date[2]) if self.exp_date[2] not in map else map[self.exp_date[2]]
         expDate = self.exp_date[-2:]+calendar.month_abbr[m].upper()+self.exp_date[:2]
-        return Utils.index+expDate+self.Strike+self.type
+        return Utils.index+expDate+self.type[0]+self.Strike
