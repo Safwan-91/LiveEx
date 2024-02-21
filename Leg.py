@@ -100,7 +100,7 @@ class LEG:
             print(self.type + " leg adjustment at ", datetime.now())
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
             if self.currentAdjustmentLevel == self.noOfAdjustments:
-                self.exit(client, priceDict)
+                self.exit(client, priceDict, users)
                 self.premium = 0
                 self.currentAdjustmentLevel += 1
                 self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(priceDict)

@@ -31,8 +31,8 @@ def getExpDate(tokenData):
         expDates = tokenData["symbol"][tokenData.symbol.str.startswith("SENSEX24")].str[6:11].unique()
     elif Utils.index == "FINNIFTY":
         expDates = tokenData["symbol"][tokenData.symbol.str.startswith("FINNIFTY")].str[8:13].unique()
-    elif Utils.index == "midcap":
-        expDates = tokenData["symbol"][tokenData.symbol.str.startswith("SENSEX24")].str[6:11].unique()
+    elif Utils.index == "MIDCPNIFTY":
+        expDates = tokenData["symbol"][tokenData.symbol.str.startswith("MIDCPNIFTY")].str[10:15].unique()
     else:
         pass
     for i in range(7):
