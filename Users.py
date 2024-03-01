@@ -22,9 +22,9 @@ class User:
             api.login(userid=self.userDetails["userid"], password=self.userDetails["password"], twoFA=input("enter shoonya otp "), vendor_code=self.userDetails["vendorCode"], api_secret=self.userDetails["secret"], imei=self.userDetails["imei"])
             return api
         elif self.userDetails["broker"] == "kotakNeo":
-            client = NeoAPI(consumer_key="q4RDblWAAJJ6udMrdIa9lS4IxGAa", consumer_secret="vQzreB9Z5NzLbMYA1t5I0kvnBYIa",
+            client = NeoAPI(consumer_key=self.userDetails["consumer_key"], consumer_secret=self.userDetails["consumer_secret"],
                             environment='Prod', on_message=None, on_error=None, on_close=None, on_open=None)
-            client.login(mobilenumber="+919447497574", password="Wafa@2020")
+            client.login(mobilenumber=self.userDetails["mobilenumber"], password=self.userDetails["password"])
             client.configuration.edit_sid = "sid"
             client.configuration.edit_token = "token"
             # client.session_2fa(input())
