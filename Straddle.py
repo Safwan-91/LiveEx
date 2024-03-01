@@ -15,6 +15,7 @@ class STRADDLE:
         return self.ce.getLegProfit(priceDict) + self.pe.getLegProfit(priceDict)
 
     def setupStraddle(self, spot, client, tokenData, priceDict, users):
+        print("setting up straddle", datetime.now())
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         self.ce.exp_date = runLive.getExpDate(tokenData)
         self.pe.exp_date = runLive.getExpDate(tokenData)

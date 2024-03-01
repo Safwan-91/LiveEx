@@ -49,14 +49,12 @@ class LEG:
             newStrike = newStrike + self.shift
 
     def setLegPars(self, symbol, tokenData, priceDict, client, users):
-        if self.token:
-            liveUtils.placeOrder(users, self.token, self.getSymbol(), getOppTransaction(self.transactionType), priceDict[self.token], 1)
         self.Strike = symbol[-7:-2]
+        if self.transactionType == "sell" and not self.token:
+            self.setHedge(priceDict, 20, tokenData, client, users)
         self.token = str(tokenData[tokenData.symbol == symbol]["token"].iloc[0])
         self.premium = liveUtils.getQuote(self.token, client)
         priceDict[self.token] = self.premium
-        if self.transactionType == "sell":
-            self.setHedge(priceDict, 20, tokenData, client, users)
         liveUtils.placeOrder(users, self.token, self.getSymbol(), self.transactionType, self.premium, 1)
         print(self.type + " parameters set with strike {} and premium {}".format(self.Strike, self.premium), )
 
@@ -96,6 +94,8 @@ class LEG:
         :return:
         """
         if self.getLegUnRealizedProfit(priceDict) < - SLMap[self.currentAdjustmentLevel] * self.premium:
+            liveUtils.placeOrder(users, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
+                                     priceDict[self.token], 1)
             initialStrike = self.Strike
             print(self.type + " leg adjustment at ", datetime.now())
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
@@ -124,6 +124,8 @@ class LEG:
         """
         if straddleCentre:
             print(self.type + " leg rematch at ", datetime.now())
+            liveUtils.placeOrder(users, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
+                                     priceDict[self.token], 1)
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
             symbol = index + self.exp_date + str(straddleCentre) + self.type
             self.setLegPars(symbol, tokenData, priceDict, client, users)
@@ -159,6 +161,9 @@ class LEG:
 
     def getSymbol(self):
         map = {"O": 10, "N": 11, "D": 12}
-        m = int(self.exp_date[2]) if self.exp_date[2] not in map else map[self.exp_date[2]]
-        expDate = self.exp_date[-2:]+calendar.month_abbr[m].upper()+self.exp_date[:2]
-        return Utils.index+expDate+self.type[0]+self.Strike
+        if self.exp_date[2].isnumeric():
+            m = int(self.exp_date[2]) if self.exp_date[2] not in map else map[self.exp_date[2]]
+            expDate = self.exp_date[-2:]+calendar.month_abbr[m].upper()+self.exp_date[:2]
+        else:
+            expDate = self.exp_date
+        return Utils.index+expDate+self.type[0]+self.Strike if Utils.index != "SENSEX" else Utils.index+expDate+self.Strike+self.type

@@ -44,7 +44,7 @@ def getExpDate(tokenData):
 
 
 def getQuote(client, tokens):
-    inst_tokens = [{"instrument_token": Utils.indexToken, "exchange_segment": "nse_cm"}]
+    inst_tokens = [{"instrument_token": str(Utils.indexToken), "exchange_segment": "nse_cm"}]
     for el in tokens:
         inst_tokens.append({"instrument_token": el, "exchange_segment": "nse_fo"})
     noOfTry = 0
@@ -77,7 +77,7 @@ class Live:
         self.mtmhit = None
         self.tokenData = liveUtils.loadTokenData()
         self.price = {}
-        self.indexToken = indexToken
+        self.indexToken = str(indexToken)
         self.expDate = getExpDate(self.tokenData)
         self.currentDate = formatDate(datetime.now().strftime("%Y-%m-%d"))
         self.strategy = Strategy("sell")
