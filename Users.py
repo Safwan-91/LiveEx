@@ -41,10 +41,18 @@ class User:
                 return order_id
             elif self.userDetails["broker"] == "shoonya":
                 transaction_type = transaction_type[0].upper()
-                # order_id = self.client.place_order(buy_or_sell=transaction_type, product_type='M',
-                #         exchange='BFO', tradingsymbol=instrument_symbol,
-                #         quantity=Utils.lotSize, discloseqty=0,price_type='MKT', #price=200.00, trigger_price=199.50,
-                #         retention='DAY', remarks='my_order_001')
+                order_id = self.client.place_order(buy_or_sell=transaction_type, product_type='M',
+                        exchange='NFO', tradingsymbol=instrument_symbol,
+                        quantity= Utils.lotSize, discloseqty=0, price_type='MKT', #price=200.00, trigger_price=199.50,
+                        retention='DAY', remarks='my_order_001')
+                flag = True
+                while flag:
+                    for el in self.client.get_order_book():
+                        if el["norenordno"] == order_id:
+                            if el["norenordno"] != "Open":
+                                break
+                            flag = False
+                            break
             print(transaction_type + " : " + str(instrument_symbol) + " at " + str(premium))
             print("time after order ", datetime.now())
         except Exception as e:
