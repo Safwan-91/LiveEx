@@ -71,6 +71,14 @@ def getAllUsers():
     return userList
 
 
+def getStrategy():
+    try:
+        positionalSaved = liveUtils.load("positional_saved")
+    except:
+        return Strategy("sell")
+    return positionalSaved if positionalSaved.started else Strategy("sell")
+
+
 class Live:
     def __init__(self, indexToken):
         self.users = getAllUsers()
@@ -80,7 +88,7 @@ class Live:
         self.indexToken = str(indexToken)
         self.expDate = getExpDate(self.tokenData)
         self.currentDate = formatDate(datetime.now().strftime("%Y-%m-%d"))
-        self.strategy = Strategy("sell")
+        self.strategy = getStrategy()
         self.strategy.tokenData = self.tokenData
 
     def callback_method(self, client):
@@ -91,7 +99,7 @@ class Live:
         for el in message:
             self.price[el['instrument_token']] = float(el['ltp'])
         if not self.strategy.started and datetime.now().strftime("%H:%M:%S") >= "00:00:00":
-            self.strategy.start(client, self.price[self.indexToken], self.price, self.users)
+            self.strategy.start(client, self.price[self.indexToken], self.price, self.users, self.tokenData)
         elif self.currentDate == self.expDate and datetime.now().strftime("%H:%M:%S") >= "15:29:00":
             self.strategy.end(client, self.price, self.users)
         elif self.mtmhit or (self.strategy.started and (
@@ -102,7 +110,7 @@ class Live:
                 print("mtm hit at " + datetime.now().strftime("%H:%M:%S") + " for ", self.mtmhit)
             return
         elif self.strategy.started:
-            self.strategy.piyushAdjustment(self.price[self.indexToken], self.price, client, self.users)
+            self.strategy.piyushAdjustment(self.price[self.indexToken], self.price, client, self.users, self.tokenData)
 
     def getAllTokens(self):
         return [self.strategy.straddle.ce.token, self.strategy.straddle.pe.token,

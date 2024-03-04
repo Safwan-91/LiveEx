@@ -19,10 +19,10 @@ class STRADDLE:
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         self.ce.exp_date = runLive.getExpDate(tokenData)
         self.pe.exp_date = runLive.getExpDate(tokenData)
-        symbolce = self.ce.getStrike(initialPremium, atm, tokenData, client)
-        symbolpe = self.pe.getStrike(initialPremium, atm, tokenData, client)
-        self.ce.setLegPars(symbolce, tokenData, priceDict, client, users)
-        self.pe.setLegPars(symbolpe, tokenData, priceDict, client, users)
+        self.ce.symbol = Utils.symbolCE
+        self.pe.symbol = Utils.symbolPE
+        self.ce.setLegPars(self.ce.symbol, tokenData, priceDict, client, users)
+        self.pe.setLegPars(self.pe.symbol, tokenData, priceDict, client, users)
         self.strikeStack = []
         self.mean.append(spot)
 

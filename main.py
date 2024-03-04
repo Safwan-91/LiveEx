@@ -13,6 +13,7 @@ if __name__ == '__main__':
         if datetime.now().strftime("%M") != currMin and datetime.now().strftime("%H:%M:%S") >= "09:45:00":
             runLive.callback_method(client.client)
             currMin = datetime.now().strftime("%M")
+            liveUtils.dump(runLive.strategy, "positional_saved")
         if runLive.mtmhit:
             break
 

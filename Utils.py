@@ -1,18 +1,27 @@
-index = "NIFTY"
+symbolCE = "BAJFINANCE24MAR6700CE"
+symbolPE = "BAJFINANCE24MAR6500PE"
+hedgeCE = "BAJFINANCE24MAR6800CE"
+hedgePE = "BAJFINANCE24MAR6400PE"
 
-initialPremiumMap = {"MIDCPNIFTY": 20, "FINNIFTY": 50, "BANKNIFTY": 100, "NIFTY": 60, "SENSEX": 100}
-mtmSLMap = {"MIDCPNIFTY": 15, "FINNIFTY": 40, "BANKNIFTY": 60, "NIFTY": 30, "SENSEX": 70}
-strikeDifferenceMap = {"MIDCPNIFTY": 25, "FINNIFTY": 50, "BANKNIFTY": 100, "NIFTY": 50, "SENSEX": 100}
-indexTokenMap = {"MIDCPNIFTY": 26074, "FINNIFTY": 26037, "BANKNIFTY": 26009, "NIFTY": 26000, "SENSEX": 1}
-lotSizeMap = {"MIDCPNIFTY": 75, "FINNIFTY": 40, "BANKNIFTY": 15, "NIFTY": 50, "SENSEX": 10}
+
+
+
+index = "positional"
+positional = "BAJFINANCE"
+
+initialPremiumMap = {"MIDCPNIFTY": 20, "FINNIFTY": 50, "BANKNIFTY": 100, "NIFTY": 60, "SENSEX": 100, "positional": 100}
+mtmSLMap = {"MIDCPNIFTY": 15, "FINNIFTY": 40, "BANKNIFTY": 60, "NIFTY": 30, "SENSEX": 70, "positional": 100}
+strikeDifferenceMap = {"MIDCPNIFTY": 25, "FINNIFTY": 50, "BANKNIFTY": 100, "NIFTY": 50, "SENSEX": 100, "positional": 100}
+indexTokenMap = {"MIDCPNIFTY": 26074, "FINNIFTY": 26037, "BANKNIFTY": 26009, "NIFTY": 26000, "SENSEX": 1, "positional": 317}
+lotSizeMap = {"MIDCPNIFTY": 75, "FINNIFTY": 40, "BANKNIFTY": 15, "NIFTY": 50, "SENSEX": 10, "positional": 100}
 
 indexToken = indexTokenMap[index]
 lotSize = lotSizeMap[index]
-SLMap = {0: 0.3, 1: 1, 2: 0}
+SLMap = {0: 0.6, 1: 1, 2: 0}
 adjustmentPercent = 0.3
 initialPremium = initialPremiumMap[index]
 mtmStopLoss = mtmSLMap[index]
 path = "C:\\Users\\Safwan PC\\banknifty_new\\"
 strikeDifference = strikeDifferenceMap[index]
-noOfAdjustment = 1
+noOfAdjustment = 0
 oneSideFullHitFlag = True

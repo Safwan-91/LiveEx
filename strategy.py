@@ -9,7 +9,6 @@ class Strategy:
     def __init__(self, transactionType):
         self.straddle = Straddle.STRADDLE(transactionType)
         self.mtm = 0
-        self.tokenData = None
         self.SL = {"0": 0.3, "1": 1}
         self.rematchStack = []
         self.shift = 200
@@ -18,9 +17,9 @@ class Strategy:
         self.hedgeStrategyDirection = None
         self.started = False
 
-    def start(self, client, spot, priceDict, users):
+    def start(self, client, spot, priceDict, users, tokenData):
         print("trade started")
-        self.straddle.setupStraddle(spot, client, self.tokenData, priceDict, users)
+        self.straddle.setupStraddle(spot, client, tokenData, priceDict, users)
         print("straddle mean is ", self.straddle.mean)
         # self.straddle.ce.setHedge(priceDict, 20, self.tokenData)
         # self.straddle.pe.setHedge(priceDict, 20, self.tokenData)
@@ -33,7 +32,7 @@ class Strategy:
         self.hedgeStrategyDirection = None
         return self.straddle.exit(client,priceDict, users)
 
-    def piyushAdjustment(self, spot, priceDict, client, users):
+    def piyushAdjustment(self, spot, priceDict, client, users, tokenData):
         if datetime.now().strftime("%S") in ["00", "01"]:
             print(priceDict)
             print("mtm is {} ce premium is {}, pe premium is {}".format(round(self.straddle.getProfit(priceDict),2), self.straddle.ce.getLegUnRealizedProfit(priceDict), self.straddle.pe.getLegUnRealizedProfit(priceDict)))
@@ -41,18 +40,18 @@ class Strategy:
         if Utils.oneSideFullHitFlag and (
                 self.straddle.pe.currentAdjustmentLevel == Utils.noOfAdjustment + 1 or self.straddle.ce.currentAdjustmentLevel == Utils.noOfAdjustment + 1):
             return
-        self.straddle.reEnter(priceDict, spot, self.tokenData, client, users)
-        self.straddle.adjust(priceDict, spot, self.tokenData, client, users)
+        self.straddle.reEnter(priceDict, spot, tokenData, client, users)
+        self.straddle.adjust(priceDict, spot, tokenData, client, users)
 
-    def hedgeAdjustment(self, spot, priceDict):
+    def hedgeAdjustment(self, spot, priceDict, tokenData=None):
         ce = self.straddle.ce.data
         pe = self.straddle.pe.data
         if self.hedgeStrategyDirection != "CE" and (
                 (spot > float(self.straddle.mean) and int(priceDict[3:5]) % 5 == 4) or spot > float(
                 self.straddle.mean) + Utils.strikeDifference / 4):
             print("hedge shifted to ce side")
-            self.straddle.ce.setHedge(priceDict, 1, self.tokenData)
-            self.straddle.pe.setHedge(priceDict, 20, self.tokenData)
+            self.straddle.ce.setHedge(priceDict, 1, tokenData)
+            self.straddle.pe.setHedge(priceDict, 20, tokenData)
             self.hedgeStrategyDirection = "CE"
             try:
                 print("mtm is {}, spot is {}, ce premium is {}, pe premium is {}, hedge premium is {}, priceDict is {}"
@@ -67,8 +66,8 @@ class Strategy:
                 (spot < float(self.straddle.mean) and int(priceDict[3:5]) % 5 == 4) or spot < float(
                 self.straddle.mean) - Utils.strikeDifference / 4):
             print("hedge shifted to pe side")
-            self.straddle.pe.setHedge(priceDict, 1, self.tokenData)
-            self.straddle.ce.setHedge(priceDict, 20, self.tokenData)
+            self.straddle.pe.setHedge(priceDict, 1, tokenData)
+            self.straddle.ce.setHedge(priceDict, 20, tokenData)
             self.hedgeStrategyDirection = "PE"
             try:
                 print("mtm is {}, spot is {}, ce premium is {}, pe premium is {}, hedge premium is {}, priceDict is {}"
@@ -85,30 +84,30 @@ class Strategy:
         #               ce[ce.priceDict == priceDict]["close"].iloc[0], pe[pe.priceDict == priceDict]["close"].iloc[0],
         #               temp.data[temp.data.priceDict == priceDict]["close"].iloc[0], priceDict))
 
-    def overNightHedge(self, priceDict):
+    def overNightHedge(self, priceDict, tokenData):
         if self.hedgeStrategyDirection == "CE":
-            self.straddle.pe.setHedge(priceDict, 3, self.tokenData)
+            self.straddle.pe.setHedge(priceDict, 3, tokenData)
         else:
-            self.straddle.ce.setHedge(priceDict, 3, self.tokenData)
+            self.straddle.ce.setHedge(priceDict, 3, tokenData)
 
-    def exitOverNightHedge(self, priceDict):
+    def exitOverNightHedge(self, priceDict, tokenData):
         if self.hedgeStrategyDirection == "CE":
-            self.straddle.pe.setHedge(priceDict, 20, self.tokenData)
+            self.straddle.pe.setHedge(priceDict, 20, tokenData)
         else:
-            self.straddle.ce.setHedge(priceDict, 20, self.tokenData)
+            self.straddle.ce.setHedge(priceDict, 20, tokenData)
 
-    def checkForAdjustmentByPoints(self, priceDict):
-        currentPrice = self.tokenData[self.tokenData.priceDict == priceDict]["close"]
+    def checkForAdjustmentByPoints(self, priceDict, tokenData):
+        currentPrice = tokenData[tokenData.priceDict == priceDict]["close"]
         if currentPrice >= currentPrice + self.shift:
             return "up"
         if currentPrice <= currentPrice - self.shift:
             return "down"
         return None
 
-    def refreshData(self):
+    def refreshData(self, tokenData):
         if self.started:
             print("refreshing data")
-            self.straddle.refreshData(self.tokenData)
+            self.straddle.refreshData(tokenData)
 
     def getMTM(self, priceDict):
         return round(self.straddle.getProfit(priceDict), 2)
