@@ -18,9 +18,9 @@ class Strategy:
         self.hedgeStrategyDirection = None
         self.started = False
 
-    def start(self, client, spot, priceDict, users):
+    def start(self, client, spot, priceDict, users, expDate):
         print("trade started")
-        self.straddle.setupStraddle(spot, client, self.tokenData, priceDict, users)
+        self.straddle.setupStraddle(spot, client, self.tokenData, priceDict, users, expDate)
         print("straddle mean is ", self.straddle.mean)
         # self.straddle.ce.setHedge(priceDict, 20, self.tokenData)
         # self.straddle.pe.setHedge(priceDict, 20, self.tokenData)

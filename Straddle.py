@@ -14,13 +14,13 @@ class STRADDLE:
     def getProfit(self, priceDict):
         return self.ce.getLegProfit(priceDict) + self.pe.getLegProfit(priceDict)
 
-    def setupStraddle(self, spot, client, tokenData, priceDict, users):
+    def setupStraddle(self, spot, client, tokenData, priceDict, users, expDate):
         print("setting up straddle", datetime.now())
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
-        self.ce.exp_date = runLive.getExpDate(tokenData)
-        self.pe.exp_date = runLive.getExpDate(tokenData)
-        symbolce = self.ce.getStrike(initialPremium, atm, tokenData, client)
-        symbolpe = self.pe.getStrike(initialPremium, atm, tokenData, client)
+        self.ce.exp_date = expDate
+        self.pe.exp_date = expDate
+        symbolce = self.ce.getStrike(priceDict, initialPremium, atm, tokenData, client)
+        symbolpe = self.pe.getStrike(priceDict, initialPremium, atm, tokenData, client)
         self.ce.setLegPars(symbolce, tokenData, priceDict, client, users)
         self.pe.setLegPars(symbolpe, tokenData, priceDict, client, users)
         self.strikeStack = []

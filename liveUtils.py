@@ -14,8 +14,9 @@ def getQuote(token, client):
     while tryNo <= 5:
         try:
             # get LTP and Market Depth Data
+            print("time before quote call " + str(datetime.now()) + " try no ", tryNo)
             ltp = client.quotes(instrument_tokens=inst_tokens, quote_type="ltp", isIndex=False)["message"][0]["ltp"]
-
+            print("time after quote call ", datetime.now())
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
             if type(ltp) is not str:
                 print(ltp)
@@ -32,7 +33,7 @@ def getQuote(token, client):
 
 
 def loadTokenData():
-    url = "https://lapi.kotaksecurities.com/wso2-scripmaster/v1/prod/" + "2024-01-21" + "/transformed/nse_fo.csv"
+    url = "https://lapi.kotaksecurities.com/wso2-scripmaster/v1/prod/" + datetime.now().strftime('%Y-%m-%d') + "/transformed/nse_fo.csv"
     response = urlopen(url)
     inst = pd.read_csv(response, sep=",")
     column_mapping = {'pSymbolName': 'instrumentName', 'pTrdSymbol': 'symbol', 'pSymbol': 'token'}

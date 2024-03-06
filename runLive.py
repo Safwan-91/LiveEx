@@ -51,7 +51,9 @@ def getQuote(client, tokens):
     while noOfTry <= 5:
         # get LTP and Market Depth Data
         try:
+            print("time before main quote call " + str(datetime.now()) + " try no ", noOfTry)
             ltp = client.quotes(instrument_tokens=inst_tokens, quote_type="ltp", isIndex=False)["message"]
+            print("time after main quote call " + str(datetime.now()))
             if type(ltp) is not list:
                 print(ltp)
                 noOfTry += 1
@@ -84,14 +86,14 @@ class Live:
         self.strategy.tokenData = self.tokenData
 
     def callback_method(self, client):
-        tokens = self.getAllTokens()
+        tokens = self.getAllTokens(client, self.price)
         message = getQuote(client, tokens)
         # print(datetime.now().strftime("%H:%M:%S"), end=" ")
         # print(message)
         for el in message:
             self.price[el['instrument_token']] = float(el['ltp'])
         if not self.strategy.started and datetime.now().strftime("%H:%M:%S") >= "00:00:00":
-            self.strategy.start(client, self.price[self.indexToken], self.price, self.users)
+            self.strategy.start(client, self.price[self.indexToken], self.price, self.users, self.expDate)
         elif self.currentDate == self.expDate and datetime.now().strftime("%H:%M:%S") >= "15:29:00":
             self.strategy.end(client, self.price, self.users)
         elif self.mtmhit or (self.strategy.started and (
@@ -104,6 +106,17 @@ class Live:
         elif self.strategy.started:
             self.strategy.piyushAdjustment(self.price[self.indexToken], self.price, client, self.users)
 
-    def getAllTokens(self):
-        return [self.strategy.straddle.ce.token, self.strategy.straddle.pe.token,
-                self.strategy.straddle.ce.hedge.token, self.strategy.straddle.pe.hedge.token] if self.strategy.started else []
+    def getAllTokens(self, client, priceDict):
+        l=[]
+        if self.strategy.started:
+            spot = priceDict[str(Utils.indexToken)]
+        else:
+            spot = getQuote(client, [])[0]["ltp"]
+        atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
+        for i in range(10):
+            symbolce = Utils.index + self.expDate + str(int(atm) + i * Utils.strikeDifference) + "CE"
+            symbolpe = Utils.index + self.expDate + str(int(atm) - i * Utils.strikeDifference) + "PE"
+            l.append(self.tokenData[self.tokenData.symbol == symbolce]["token"].iloc[0])
+            l.append(self.tokenData[self.tokenData.symbol == symbolpe]["token"].iloc[0])
+        return l
+
