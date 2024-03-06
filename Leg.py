@@ -25,9 +25,10 @@ class LEG:
         self.shift = strikeDifference if type == "CE" else -strikeDifference
         self.hedge = None
 
-    def getStrike(self, premiumTarget, atm, tokenData, client):
+    def getStrike(self, priceDict , premiumTarget, atm, tokenData, client):
         """
         fetches the strike which has premium closest to premium target.
+        :param priceDict:
         :param premiumTarget: always less than self.premium.
         :param bankNiftyData:
         :param time:
@@ -40,7 +41,7 @@ class LEG:
             token = tokenData[tokenData.symbol == symbol]["token"].iloc[0]
             premium = 0
             try:
-                premium = liveUtils.getQuote(token, client)
+                premium = priceDict[token] if token in priceDict else liveUtils.getQuote(token, client)
             except Exception as e:
                 print(e)
             if premium < premiumTarget:
@@ -53,7 +54,8 @@ class LEG:
         if self.transactionType == "sell" and not self.token:
             self.setHedge(priceDict, 20, tokenData, client, users)
         self.token = str(tokenData[tokenData.symbol == symbol]["token"].iloc[0])
-        self.premium = liveUtils.getQuote(self.token, client)
+        if not self.premium:
+            self.premium = priceDict[self.token] if self.token in priceDict else liveUtils.getQuote(self.token, client)
         priceDict[self.token] = self.premium
         liveUtils.placeOrder(users, self.token, self.getSymbol(), self.transactionType, self.premium, 1)
         print(self.type + " parameters set with strike {} and premium {}".format(self.Strike, self.premium), )
@@ -107,7 +109,7 @@ class LEG:
                 self.hedge.premium = 0
                 return int(initialStrike)
             else:
-                symbol = self.getStrike(adjustmentPercent * self.premium, None, tokenData, client)
+                symbol = self.getStrike(priceDict, adjustmentPercent * self.premium, None, tokenData, client)
                 self.setLegPars(symbol, tokenData, priceDict, client, users)
                 # self.setHedge(priceDict, 20, tokenData)
                 self.currentAdjustmentLevel += 1
@@ -128,6 +130,7 @@ class LEG:
                                      priceDict[self.token], 1)
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
             symbol = index + self.exp_date + str(straddleCentre) + self.type
+            self.premium = 0
             self.setLegPars(symbol, tokenData, priceDict, client, users)
             # self.setHedge(priceDict, 20, tokenData)
             self.currentAdjustmentLevel -= 1
