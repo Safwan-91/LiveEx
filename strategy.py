@@ -18,31 +18,30 @@ class Strategy:
         self.hedgeStrategyDirection = None
         self.started = False
 
-    def start(self, client, spot, priceDict, users, expDate):
+    def start(self, client, spot, users, expDate):
         print("trade started")
-        self.straddle.setupStraddle(spot, client, self.tokenData, priceDict, users, expDate)
+        self.straddle.setupStraddle(spot, client, self.tokenData, users, expDate)
         print("straddle mean is ", self.straddle.mean)
         # self.straddle.ce.setHedge(priceDict, 20, self.tokenData)
         # self.straddle.pe.setHedge(priceDict, 20, self.tokenData)
         # self.hedgeAdjustment(spot, priceDict)
         self.started = True
 
-    def end(self, client, priceDict, users):
+    def end(self, client, users):
         print("trade ended")
         self.started = False
         self.hedgeStrategyDirection = None
-        return self.straddle.exit(client,priceDict, users)
+        return self.straddle.exit(client, users)
 
-    def piyushAdjustment(self, spot, priceDict, client, users):
+    def piyushAdjustment(self, spot, client, users):
         if datetime.now().strftime("%S") in ["00", "01"]:
-            print(priceDict)
-            print("mtm is {} ce premium is {}, pe premium is {}".format(round(self.straddle.getProfit(priceDict),2), self.straddle.ce.getLegUnRealizedProfit(priceDict), self.straddle.pe.getLegUnRealizedProfit(priceDict)))
+            print("mtm is {} ce premium is {}, pe premium is {}".format(round(self.straddle.getProfit(client),2), self.straddle.ce.getLegUnRealizedProfit(client), self.straddle.pe.getLegUnRealizedProfit(client)))
             print("ce adjustment level - " + str(self.straddle.ce.currentAdjustmentLevel) + " pe adjustment level - " + str(self.straddle.pe.currentAdjustmentLevel))
         if Utils.oneSideFullHitFlag and (
                 self.straddle.pe.currentAdjustmentLevel == Utils.noOfAdjustment + 1 or self.straddle.ce.currentAdjustmentLevel == Utils.noOfAdjustment + 1):
             return
-        self.straddle.reEnter(priceDict, spot, self.tokenData, client, users)
-        self.straddle.adjust(priceDict, spot, self.tokenData, client, users)
+        self.straddle.reEnter(spot, self.tokenData, client, users)
+        self.straddle.adjust(spot, self.tokenData, client, users)
 
     def hedgeAdjustment(self, spot, priceDict):
         ce = self.straddle.ce.data

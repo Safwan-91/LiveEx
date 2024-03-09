@@ -8,20 +8,19 @@ import pandas as pd
 from neo_api_client import NeoAPI
 
 
-def getQuote(token, client):
-    inst_tokens = [{"instrument_token": str(token), "exchange_segment": "nse_fo"}]
+def getQuote(symbol, client):
     tryNo = 0
     while tryNo <= 5:
         try:
-            # get LTP and Market Depth Data
-            print("time before quote call " + str(datetime.now()) + " try no ", tryNo)
-            ltp = client.quotes(instrument_tokens=inst_tokens, quote_type="ltp", isIndex=False)["message"][0]["ltp"]
-            print("time after quote call ", datetime.now())
+            # print("time before quote call " + str(datetime.now()) + " try no ", tryNo)
+            ltp = client.IB_LTP("NFO", symbol, "")
+            # print("time after quote call ", datetime.now())
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
-            if type(ltp) is not str:
-                print(ltp)
+            if ltp == 0:
+                print("get quote attempt failed ", ltp)
+                client.IB_Subscribe("NFO", symbol, "")
                 tryNo += 1
-                time.sleep(1)
+                time.sleep(0.5)
                 continue
             return float(ltp)
         except Exception as e:
@@ -55,6 +54,26 @@ def load(name):
     return db
 
 
-def placeOrder(users, instrument_token, instrument_symbol, transaction_type, premium, quantity):
-    for user in users:
-        user.order(instrument_token, instrument_symbol, transaction_type, premium, quantity)
+def placeOrder(client, instrument_token, instrument_symbol, transaction_type, premium, quantity):
+    print("time before order call " + str(datetime.now()))
+    transaction_type = "LE" if transaction_type == "buy" else "SE"
+    orderID = client.IB_MappedOrderAdv(SignalID=0,
+                               StrategyTag="DEFAULT",
+                               SourceSymbol=instrument_token,
+                               TransactionType="LE",
+                               OrderType="MARKET",
+                               ProductType="NRML",
+                               Price="",
+                               TriggerPrice="",
+                               Quantity=1,
+                               ProfitValue="",
+                               StoplossValue="",
+                               SLTrailingValue="",
+                               SignalLTP=0,
+                               OptionsType="")
+    while not client.IB_IsOrderOpen(orderID):
+        continue
+    print(transaction_type + " : " + str(instrument_symbol) + " at " + str(premium))
+    print("time before order call " + str(datetime.now()))
+    # for user in users:
+    #     user.order(instrument_token, instrument_symbol, transaction_type, premium, quantity)
