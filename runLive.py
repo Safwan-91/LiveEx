@@ -74,7 +74,7 @@ def getAllUsers():
 
 
 class Live:
-    def __init__(self, indexToken):
+    def __init__(self, indexToken, client):
         self.users = getAllUsers()
         self.mtmhit = None
         self.tokenData = liveUtils.loadTokenData()
@@ -84,39 +84,33 @@ class Live:
         self.currentDate = formatDate(datetime.now().strftime("%Y-%m-%d"))
         self.strategy = Strategy("sell")
         self.strategy.tokenData = self.tokenData
+        self.subscribeAllTokens(client)
 
     def callback_method(self, client):
-        tokens = self.getAllTokens(client, self.price)
-        message = getQuote(client, tokens)
+        self.subscribeAllTokens(client)
         # print(datetime.now().strftime("%H:%M:%S"), end=" ")
         # print(message)
-        for el in message:
-            self.price[el['instrument_token']] = float(el['ltp'])
         if not self.strategy.started and datetime.now().strftime("%H:%M:%S") >= "00:00:00":
-            self.strategy.start(client, self.price[self.indexToken], self.price, self.users, self.expDate)
+            self.strategy.start(client, client.IB_LTP("NSE", Utils.index, ""), self.users, self.expDate)
         elif self.currentDate == self.expDate and datetime.now().strftime("%H:%M:%S") >= "15:29:00":
-            self.strategy.end(client, self.price, self.users)
+            self.strategy.end(client, self.users)
         elif self.mtmhit or (self.strategy.started and (
-                self.strategy.straddle.getProfit(self.price) < -Utils.mtmStopLoss)):
+                self.strategy.straddle.getProfit(client) < -Utils.mtmStopLoss)):
             if not self.mtmhit:
-                self.mtmhit = (self.strategy.straddle.getProfit(self.price))
-                self.strategy.end(client, self.price, self.users)
+                self.mtmhit = (self.strategy.straddle.getProfit(client))
+                self.strategy.end(client, self.users)
                 print("mtm hit at " + datetime.now().strftime("%H:%M:%S") + " for ", self.mtmhit)
             return
         elif self.strategy.started:
-            self.strategy.piyushAdjustment(self.price[self.indexToken], self.price, client, self.users)
+            self.strategy.piyushAdjustment(client.IB_LTP("NSE", Utils.index, ""), client, self.users)
 
-    def getAllTokens(self, client, priceDict):
-        l=[]
-        if self.strategy.started:
-            spot = priceDict[str(Utils.indexToken)]
-        else:
-            spot = getQuote(client, [])[0]["ltp"]
+    def subscribeAllTokens(self, client):
+        client.IB_Subscribe("NSE", Utils.index, "")
+        spot = client.IB_LTP("NSE", Utils.index, "")
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         for i in range(10):
             symbolce = Utils.index + self.expDate + str(int(atm) + i * Utils.strikeDifference) + "CE"
             symbolpe = Utils.index + self.expDate + str(int(atm) - i * Utils.strikeDifference) + "PE"
-            l.append(self.tokenData[self.tokenData.symbol == symbolce]["token"].iloc[0])
-            l.append(self.tokenData[self.tokenData.symbol == symbolpe]["token"].iloc[0])
-        return l
+            client.IB_Subscribe("NFO", symbolce, "")
+            client.IB_Subscribe("NFO", symbolpe, "")
 
