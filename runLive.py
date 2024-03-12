@@ -91,7 +91,7 @@ class Live:
         # print(datetime.now().strftime("%H:%M:%S"), end=" ")
         # print(message)
         if not self.strategy.started and datetime.now().strftime("%H:%M:%S") >= "00:00:00":
-            self.strategy.start(client, client.IB_LTP("NSE", Utils.index, ""), self.users, self.expDate)
+            self.strategy.start(client, client.IB_LTP("NSE", Utils.indexToken, ""), self.users, self.expDate)
         elif self.currentDate == self.expDate and datetime.now().strftime("%H:%M:%S") >= "15:29:00":
             self.strategy.end(client, self.users)
         elif self.mtmhit or (self.strategy.started and (
@@ -102,11 +102,11 @@ class Live:
                 print("mtm hit at " + datetime.now().strftime("%H:%M:%S") + " for ", self.mtmhit)
             return
         elif self.strategy.started:
-            self.strategy.piyushAdjustment(client.IB_LTP("NSE", Utils.index, ""), client, self.users)
+            self.strategy.piyushAdjustment(client.IB_LTP("NSE", Utils.indexToken, ""), client, self.users)
 
     def subscribeAllTokens(self, client):
-        client.IB_Subscribe("NSE", Utils.index, "")
-        spot = client.IB_LTP("NSE", Utils.index, "")
+        client.IB_Subscribe("NSE", Utils.indexToken, "")
+        spot = client.IB_LTP("NSE", Utils.indexToken, "")
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         for i in range(10):
             symbolce = Utils.index + self.expDate + str(int(atm) + i * Utils.strikeDifference) + "CE"
