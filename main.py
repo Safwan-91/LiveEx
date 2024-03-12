@@ -8,7 +8,7 @@ from pyIB_APIS import IB_APIS
 
 if __name__ == '__main__':
     client = IB_APIS("http://localhost:21000")
-    client.IB_Subscribe("NSE", Utils.index, "")
+    client.IB_Subscribe("NSE", Utils.indexToken, "")
     runLive = Live(Utils.indexToken, client)
     currMin = None
     while "00:00:00" <= datetime.now().strftime("%H:%M:%S") <= "24:29:00":
