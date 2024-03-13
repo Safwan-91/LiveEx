@@ -11,8 +11,8 @@ if __name__ == '__main__':
     client.IB_Subscribe("NSE", Utils.indexToken, "")
     runLive = Live(Utils.indexToken, client)
     currMin = None
-    while "00:00:00" <= datetime.now().strftime("%H:%M:%S") <= "24:29:00":
-        if datetime.now().strftime("%M") != currMin:# and datetime.now().strftime("%H:%M:%S") >= "09:45:00":
+    while "09:15:00" <= datetime.now().strftime("%H:%M:%S") <= "15:30:00":
+        if datetime.now().strftime("%M") != currMin and datetime.now().strftime("%H:%M:%S") >= "09:45:00":
             runLive.callback_method(client)
             currMin = datetime.now().strftime("%M")
         if runLive.mtmhit:
