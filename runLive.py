@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 import Utils
 import userDetails
-from Users import User
 from strategy import Strategy
 import liveUtils
 
@@ -68,8 +67,6 @@ def getQuote(client, tokens):
 
 def getAllUsers():
     userList = []
-    for Id in userDetails.activeUsers:
-        userList.append(User(Id))
     return userList
 
 
@@ -91,7 +88,7 @@ class Live:
         # print(datetime.now().strftime("%H:%M:%S"), end=" ")
         # print(message)
         if not self.strategy.started and datetime.now().strftime("%H:%M:%S") >= "00:00:00":
-            self.strategy.start(client, client.IB_LTP("NSE", Utils.indexToken, ""), self.users, self.expDate)
+            self.strategy.start(client, client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), self.users, self.expDate)
         elif self.currentDate == self.expDate and datetime.now().strftime("%H:%M:%S") >= "15:29:00":
             self.strategy.end(client, self.users)
         elif self.mtmhit or (self.strategy.started and (
@@ -102,15 +99,15 @@ class Live:
                 print("mtm hit at " + datetime.now().strftime("%H:%M:%S") + " for ", self.mtmhit)
             return
         elif self.strategy.started:
-            self.strategy.piyushAdjustment(client.IB_LTP("NSE", Utils.indexToken, ""), client, self.users)
+            self.strategy.piyushAdjustment(client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), client, self.users)
 
     def subscribeAllTokens(self, client):
-        client.IB_Subscribe("NSE", Utils.indexToken, "")
-        spot = client.IB_LTP("NSE", Utils.indexToken, "")
+        client.IB_Subscribe(Utils.indexExchange, Utils.indexToken, "")
+        spot = client.IB_LTP(Utils.indexExchange, Utils.indexToken, "")
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         for i in range(10):
             symbolce = Utils.index + self.expDate + str(int(atm) + i * Utils.strikeDifference) + "CE"
             symbolpe = Utils.index + self.expDate + str(int(atm) - i * Utils.strikeDifference) + "PE"
-            client.IB_Subscribe("NFO", symbolce, "")
-            client.IB_Subscribe("NFO", symbolpe, "")
+            client.IB_Subscribe(Utils.fnoExchange, symbolce, "")
+            client.IB_Subscribe(Utils.fnoExchange, symbolpe, "")
 

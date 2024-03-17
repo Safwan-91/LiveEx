@@ -1,4 +1,6 @@
-index = "BANKNIFTY"
+index = "SENSEX"
+indexExchange = "BSE"
+fnoExchange = "BFO"
 
 initialPremiumMap = {"MIDCPNIFTY": 20, "FINNIFTY": 40, "BANKNIFTY": 100, "NIFTY": 60, "SENSEX": 100}
 mtmSLMap = {"MIDCPNIFTY": 15, "FINNIFTY": 30, "BANKNIFTY": 60, "NIFTY": 30, "SENSEX": 70}
