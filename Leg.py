@@ -154,6 +154,8 @@ class LEG:
             self.hedge.updatePremium(client)
 
     def exit(self, client, users):
+        if not self.premium:
+            return
         print("exiting leg")
         liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType), liveUtils.getQuote(self.token, client), 1)
         if self.hedge:
