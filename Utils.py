@@ -1,6 +1,8 @@
 index = "BANKEX"
 indexExchange = "BSE"
 fnoExchange = "BFO"
+adjustmentShift = "False"
+
 
 initialPremiumMap = {"MIDCPNIFTY": 25, "FINNIFTY": 40, "BANKNIFTY": 100, "NIFTY": 60, "SENSEX": 100, "BANKEX": 100}
 mtmSLMap = {"MIDCPNIFTY": 10, "FINNIFTY": 30, "BANKNIFTY": 60, "NIFTY": 30, "SENSEX": 70, "BANKEX": 60}

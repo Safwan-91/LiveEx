@@ -1,3 +1,4 @@
+import Utils
 from Leg import *
 import runLive
 
@@ -32,9 +33,13 @@ class STRADDLE:
         if cestrike:
             self.strikeStack.append(cestrike)
             self.mean.append(spot)
+            if Utils.adjustmentShift and self.pe.currentAdjustmentLevel == 2:
+                self.ce.shiftIn(client, tokenData, users)
         elif pestrike:
             self.strikeStack.append(pestrike)
             self.mean.append(spot)
+            if Utils.adjustmentShift and self.pe.currentAdjustmentLevel == 2:
+                self.ce.shiftIn(client, tokenData, users)
 
     def reEnter(self, spot, tokenData, client, users):
         if self.ce.currentAdjustmentLevel >= 1 and spot < self.mean[-2]:
