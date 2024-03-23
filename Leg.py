@@ -134,6 +134,12 @@ class LEG:
             self.currentAdjustmentLevel -= 1
             return 0
 
+    def shiftIn(self, client, tokenData, users):
+        print("shifting in ", self.type)
+        self.realizedProfit += self.getLegUnRealizedProfit(client)
+        symbol = Utils.index + self.exp_date + str(int(self.Strike)-2*self.shift) + self.type
+        self.setLegPars(symbol, tokenData, client, users)
+
     def setHedge(self, hedgeDist, tokenData, client, users):
         transactionType = "buy" if self.transactionType == "sell" else "sell"
         self.hedge = LEG(self.type, transactionType) if not self.hedge else self.hedge
