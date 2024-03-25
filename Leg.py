@@ -50,8 +50,8 @@ class LEG:
 
     def setLegPars(self, symbol, tokenData, client, users):
         self.Strike = symbol[-7:-2]
-        if self.transactionType == "sell" and not self.token:
-            self.setHedge(20, tokenData, client, users)
+        # if self.transactionType == "sell" and not self.token:
+        #     self.setHedge(20, tokenData, client, users)
         self.token = symbol
         if not self.premium:
             self.premium = liveUtils.getQuote(self.token, client)
@@ -137,7 +137,7 @@ class LEG:
     def shiftIn(self, client, tokenData, users):
         print("shifting in ", self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(client)
-        symbol = Utils.index + self.exp_date + str(int(self.Strike)-2*self.shift) + self.type
+        symbol = Utils.index + self.exp_date + str(int(self.Strike) - Utils.shiftAmount * self.shift) + self.type
         self.setLegPars(symbol, tokenData, client, users)
 
     def setHedge(self, hedgeDist, tokenData, client, users):
