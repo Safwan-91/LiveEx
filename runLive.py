@@ -81,12 +81,12 @@ class Live:
         self.currentDate = formatDate(datetime.now().strftime("%Y-%m-%d"))
         self.strategy = Strategy("sell")
         self.strategy.tokenData = self.tokenData
-        self.subscribeAllTokens(client)
 
     def callback_method(self, client):
         self.subscribeAllTokens(client)
-        # print(datetime.now().strftime("%H:%M:%S"), end=" ")
-        # print(message)
+        if datetime.now().strftime("%H:%M") == "09:44":
+            time.sleep(10)
+            self.buyHedge(client)
         if not self.strategy.started and datetime.now().strftime("%H:%M:%S") >= "00:00:00":
             self.strategy.start(client, client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), self.users, self.expDate)
         elif self.currentDate == self.expDate and datetime.now().strftime("%H:%M:%S") >= "15:29:00":
@@ -111,3 +111,10 @@ class Live:
             client.IB_Subscribe(Utils.fnoExchange, symbolce, "")
             client.IB_Subscribe(Utils.fnoExchange, symbolpe, "")
 
+    def buyHedge(self, client):
+        spot = client.IB_LTP(Utils.indexExchange, Utils.indexToken, "")
+        atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
+        symbolce = Utils.index + self.expDate + str(int(atm) + 20 * Utils.strikeDifference) + "CE"
+        symbolpe = Utils.index + self.expDate + str(int(atm) - 20 * Utils.strikeDifference) + "PE"
+        liveUtils.placeOrder(client, self.tokenData, symbolce, "buy", 0, 1)
+        liveUtils.placeOrder(client, self.tokenData, symbolpe, "buy", 0, 1)

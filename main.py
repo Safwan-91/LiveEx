@@ -11,7 +11,7 @@ if __name__ == '__main__':
     runLive = Live(Utils.indexToken, client)
     currMin = None
     while "09:15:00" <= datetime.now().strftime("%H:%M:%S") <= "15:30:00":
-        if datetime.now().strftime("%M") != currMin and datetime.now().strftime("%H:%M:%S") >= "09:45:00":
+        if datetime.now().strftime("%M") != currMin and datetime.now().strftime("%H:%M:%S") >= "09:44:00":
             runLive.callback_method(client)
             currMin = datetime.now().strftime("%M")
         if runLive.mtmhit:
