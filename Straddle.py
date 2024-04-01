@@ -33,8 +33,8 @@ class STRADDLE:
         if cestrike:
             self.strikeStack.append(cestrike)
             self.mean.append(spot)
-            if Utils.adjustmentShift and self.pe.currentAdjustmentLevel == 2:
-                self.ce.shiftIn(client, tokenData, users)
+            if Utils.adjustmentShift and self.ce.currentAdjustmentLevel == 2:
+                self.pe.shiftIn(client, tokenData, users)
         elif pestrike:
             self.strikeStack.append(pestrike)
             self.mean.append(spot)
