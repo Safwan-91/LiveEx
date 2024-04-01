@@ -103,8 +103,8 @@ class LEG:
                 self.exit(client, users)
                 self.premium = 0
                 self.currentAdjustmentLevel += 1
-                self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(client)
-                self.hedge.premium = 0
+                # self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(client)
+                # self.hedge.premium = 0
                 return int(initialStrike)
             else:
                 symbol = self.getStrike(adjustmentPercent * self.premium, None, tokenData, client)

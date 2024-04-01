@@ -59,20 +59,20 @@ def placeOrder(client, instrument_token, instrument_symbol, transaction_type, pr
     print("time before order call " + str(datetime.now()))
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     orderID = client.IB_MappedOrderAdv(SignalID=0,
-                               StrategyTag="DEFAULT",
+                               StrategyTag="OPTIONSPLAYPYSAF",
                                SourceSymbol=instrument_token,
                                TransactionType=transaction_type,
                                OrderType="MARKET",
                                ProductType="NRML",
                                Price="",
                                TriggerPrice="",
-                               Quantity=1,
+                               Quantity=Utils.lotSize,
                                ProfitValue="",
                                StoplossValue="",
                                SLTrailingValue="",
                                SignalLTP=0,
                                OptionsType="")
-    while (client.IB_IsOrderOpen(orderID))=="true":
+    while (client.IB_IsOrderCompleted(orderID))!="true":
         continue
     print(transaction_type + " : " + str(instrument_symbol) + " at " + str(premium))
     print("time before order call " + str(datetime.now()))

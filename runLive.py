@@ -32,6 +32,8 @@ def getExpDate(tokenData):
         expDates = tokenData["symbol"][tokenData.symbol.str.startswith("FINNIFTY")].str[8:13].unique()
     elif Utils.index == "MIDCPNIFTY":
         expDates = tokenData["symbol"][tokenData.symbol.str.startswith("MIDCPNIFTY")].str[10:15].unique()
+    elif Utils.index == "BANKEX":
+        expDates = tokenData["symbol"][tokenData.symbol.str.startswith("BANKEX")].str[6:11].unique()
     else:
         pass
     for i in range(7):
@@ -81,12 +83,14 @@ class Live:
         self.currentDate = formatDate(datetime.now().strftime("%Y-%m-%d"))
         self.strategy = Strategy("sell")
         self.strategy.tokenData = self.tokenData
+        self.hedge = False
 
     def callback_method(self, client):
         self.subscribeAllTokens(client)
-        if datetime.now().strftime("%H:%M") == "09:44":
+        if not self.hedge and datetime.now().strftime("%H:%M") >= "09:44":
             time.sleep(10)
             self.buyHedge(client)
+            self.hedge = True
         if not self.strategy.started and datetime.now().strftime("%H:%M:%S") >= "00:00:00":
             self.strategy.start(client, client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), self.users, self.expDate)
         elif self.currentDate == self.expDate and datetime.now().strftime("%H:%M:%S") >= "15:29:00":
@@ -116,5 +120,5 @@ class Live:
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         symbolce = Utils.index + self.expDate + str(int(atm) + 20 * Utils.strikeDifference) + "CE"
         symbolpe = Utils.index + self.expDate + str(int(atm) - 20 * Utils.strikeDifference) + "PE"
-        liveUtils.placeOrder(client, self.tokenData, symbolce, "buy", 0, 1)
-        liveUtils.placeOrder(client, self.tokenData, symbolpe, "buy", 0, 1)
+        liveUtils.placeOrder(client, symbolce, symbolce, "buy", 0, 1)
+        liveUtils.placeOrder(client, symbolpe, symbolpe, "buy", 0, 1)
