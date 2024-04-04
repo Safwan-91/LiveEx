@@ -35,7 +35,7 @@ class Strategy:
         return self.straddle.exit(client, users)
 
     def piyushAdjustment(self, spot, client, users):
-        if datetime.now().strftime("%S") in ["00", "01"]:
+        if datetime.now().strftime("%S") in ["00", "01"] and int(datetime.now().strftime("%M"))%10 == 0:
             print("mtm is {} ce premium is {}, pe premium is {}".format(round(self.straddle.getProfit(client),2), liveUtils.getQuote(self.straddle.ce.token, client), liveUtils.getQuote(self.straddle.pe.token, client)))
             print("ce adjustment level - " + str(self.straddle.ce.currentAdjustmentLevel) + " pe adjustment level - " + str(self.straddle.pe.currentAdjustmentLevel))
         if Utils.oneSideFullHitFlag and (
