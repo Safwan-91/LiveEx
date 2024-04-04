@@ -2,6 +2,7 @@ from datetime import datetime
 
 import Straddle
 import Utils
+import liveUtils
 
 
 class Strategy:
@@ -35,7 +36,7 @@ class Strategy:
 
     def piyushAdjustment(self, spot, client, users):
         if datetime.now().strftime("%S") in ["00", "01"]:
-            print("mtm is {} ce premium is {}, pe premium is {}".format(round(self.straddle.getProfit(client),2), self.straddle.ce.getLegUnRealizedProfit(client), self.straddle.pe.getLegUnRealizedProfit(client)))
+            print("mtm is {} ce premium is {}, pe premium is {}".format(round(self.straddle.getProfit(client),2), liveUtils.getQuote(self.straddle.ce.token, client), liveUtils.getQuote(self.straddle.pe.token, client)))
             print("ce adjustment level - " + str(self.straddle.ce.currentAdjustmentLevel) + " pe adjustment level - " + str(self.straddle.pe.currentAdjustmentLevel))
         if Utils.oneSideFullHitFlag and (
                 self.straddle.pe.currentAdjustmentLevel == Utils.noOfAdjustment + 1 or self.straddle.ce.currentAdjustmentLevel == Utils.noOfAdjustment + 1):

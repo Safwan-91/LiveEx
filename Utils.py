@@ -1,6 +1,6 @@
-index = "BANKEX"
-indexExchange = "BSE"
-fnoExchange = "BFO"
+index = "NIFTY"
+indexExchange = "NSE"
+fnoExchange = "NFO"
 adjustmentShift = "True"
 
 
