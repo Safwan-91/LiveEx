@@ -94,11 +94,11 @@ class LEG:
         :return:
         """
         if self.getLegUnRealizedProfit(client) < - SLMap[self.currentAdjustmentLevel] * self.premium:
+            self.realizedProfit += self.getLegUnRealizedProfit(client)
             liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
                                      liveUtils.getQuote(self.token, client), 1)
             initialStrike = self.Strike
             print(self.type + " leg adjustment at ", datetime.now())
-            self.realizedProfit += self.getLegUnRealizedProfit(client)
             if self.currentAdjustmentLevel == self.noOfAdjustments:
                 self.exit(client, users)
                 self.premium = 0
@@ -124,9 +124,9 @@ class LEG:
         """
         if straddleCentre:
             print(self.type + " leg rematch at ", datetime.now())
+            self.realizedProfit += self.getLegUnRealizedProfit(client)
             liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
                                      liveUtils.getQuote(self.token, client), 1)
-            self.realizedProfit += self.getLegUnRealizedProfit(client)
             symbol = index + self.exp_date + str(straddleCentre) + self.type
             self.premium = 0
             self.setLegPars(symbol, tokenData, client, users)
@@ -137,6 +137,8 @@ class LEG:
     def shiftIn(self, client, tokenData, users):
         print("shifting in ", self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(client)
+        liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
+                             liveUtils.getQuote(self.token, client), 1)
         symbol = Utils.index + self.exp_date + str(int(self.Strike) - Utils.shiftAmount * self.shift) + self.type
         self.setLegPars(symbol, tokenData, client, users)
 

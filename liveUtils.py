@@ -66,7 +66,7 @@ def placeOrder(client, instrument_token, instrument_symbol, transaction_type, pr
                                ProductType="NRML",
                                Price="",
                                TriggerPrice="",
-                               Quantity=Utils.lotSize,
+                               Quantity=1,
                                ProfitValue="",
                                StoplossValue="",
                                SLTrailingValue="",
@@ -74,7 +74,7 @@ def placeOrder(client, instrument_token, instrument_symbol, transaction_type, pr
                                OptionsType="")
     while (client.IB_IsOrderCompleted(orderID))!="true":
         continue
-    print(transaction_type + " : " + str(instrument_symbol) + " at " + str(premium))
+    print(transaction_type + " : " + str(instrument_token) + " at " + str(premium))
     print("time before order call " + str(datetime.now()))
     # for user in users:
     #     user.order(instrument_token, instrument_symbol, transaction_type, premium, quantity)

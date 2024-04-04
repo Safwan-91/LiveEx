@@ -91,6 +91,8 @@ class Live:
             time.sleep(10)
             self.buyHedge(client)
             self.hedge = True
+            if datetime.now().strftime("%H:%M") == "09:44":
+                return
         if not self.strategy.started and datetime.now().strftime("%H:%M:%S") >= "00:00:00":
             self.strategy.start(client, client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), self.users, self.expDate)
         elif self.currentDate == self.expDate and datetime.now().strftime("%H:%M:%S") >= "15:29:00":
