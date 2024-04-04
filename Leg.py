@@ -95,8 +95,6 @@ class LEG:
         """
         if self.getLegUnRealizedProfit(client) < - SLMap[self.currentAdjustmentLevel] * self.premium:
             self.realizedProfit += self.getLegUnRealizedProfit(client)
-            liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
-                                     liveUtils.getQuote(self.token, client), 1)
             initialStrike = self.Strike
             print(self.type + " leg adjustment at ", datetime.now())
             if self.currentAdjustmentLevel == self.noOfAdjustments:
@@ -107,6 +105,8 @@ class LEG:
                 # self.hedge.premium = 0
                 return int(initialStrike)
             else:
+                liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
+                                     liveUtils.getQuote(self.token, client), 1)
                 symbol = self.getStrike(adjustmentPercent * self.premium, None, tokenData, client)
                 self.setLegPars(symbol, tokenData, client, users)
                 # self.setHedge(priceDict, 20, tokenData)
