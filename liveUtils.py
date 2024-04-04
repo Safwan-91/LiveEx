@@ -66,7 +66,7 @@ def placeOrder(client, instrument_token, instrument_symbol, transaction_type, pr
                                ProductType="NRML",
                                Price="",
                                TriggerPrice="",
-                               Quantity=1,
+                               Quantity=Utils.lotSize,
                                ProfitValue="",
                                StoplossValue="",
                                SLTrailingValue="",
