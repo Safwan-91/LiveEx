@@ -19,6 +19,7 @@ def getTokenDataDateFromat(date):
 
 
 def getExpDate(tokenData):
+    return "24APR"
     expDates = []
     if Utils.index == "CRUDEOIL":
         return "24FEB"

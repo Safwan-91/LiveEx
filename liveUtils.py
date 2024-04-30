@@ -72,9 +72,21 @@ def placeOrder(client, instrument_token, instrument_symbol, transaction_type, pr
                                SLTrailingValue="",
                                SignalLTP=0,
                                OptionsType="")
-    while (client.IB_IsOrderCompleted(orderID))!="true":
-        continue
+    print("orderId is ", orderID)
+    while True:
+        try:
+            statuses = client.IB_OrderStatus(orderID).split(",")
+        except Exception as e:
+            print(e)
+            time.sleep(1)
+            continue
+        done = True
+        for status in statuses:
+            if status != "completed":
+                done = False
+        if done:
+            break
     print(transaction_type + " : " + str(instrument_token) + " at " + str(premium))
-    print("time before order call " + str(datetime.now()))
+    print("time after order call " + str(datetime.now()))
     # for user in users:
     #     user.order(instrument_token, instrument_symbol, transaction_type, premium, quantity)
