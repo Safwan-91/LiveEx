@@ -31,7 +31,7 @@ class Strategy:
 
     def piyushAdjustment(self, spot, client, currentTime):
         Utils.logger.info("checking for piyush adjustment, spot is " + str(spot))
-        if currentTime[3:5] % 10 == 0:
+        if int(currentTime[3:5]) % 10 == 0:
             Utils.logger.info(
                 "mtm is {} ce premium is {}, pe premium is {}".format(round(self.straddle.getProfit(client), 2),
                                                                       liveUtils.getQuote(self.straddle.ce.token,

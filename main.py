@@ -12,9 +12,10 @@ if __name__ == '__main__':
     currentTime = datetime.now().strftime("%H:%M:%S")
     lastMin = None
     while "09:15:00" <= currentTime <= "15:30:00":
-        if currentTime[3:5] != lastMin and currentTime >= "09:44:00":
+        if currentTime[3:5] != lastMin and currentTime >= Utils.startTime:
             runLive.callback_method(client, currentTime)
             lastMin = currentTime[3:5]
+        currentTime = datetime.now().strftime("%H:%M:%S")
         if runLive.mtmhit:
             break
 

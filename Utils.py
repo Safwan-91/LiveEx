@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-logPath = "C:/Users/Administrator/Desktop/logs"
+logPath = "C:/Users/Administrator/Desktop/logs/"
 formatter = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(filename=logPath+datetime.now().strftime('%Y-%m-%d')+'.log', level=logging.DEBUG, format=formatter)
 logger = logging.getLogger(__name__)
@@ -13,6 +13,9 @@ index = "NIFTY"
 expDate = "24502"
 indexExchange = "NSE"
 fnoExchange = "NFO"
+startTime = "09:44:00"
+adjSL = 1
+
 adjustmentShift = "True"
 
 initialPremiumMap = {"MIDCPNIFTY": 25, "FINNIFTY": 40, "BANKNIFTY": 100, "NIFTY": 50, "SENSEX": 163, "BANKEX": 115}
@@ -22,10 +25,10 @@ indexTokenMap = {"MIDCPNIFTY": "NIFTY MID SELECT", "FINNIFTY": "NIFTY FIN SERVIC
 lotSizeMap = {"MIDCPNIFTY": 1, "FINNIFTY": 3, "BANKNIFTY": 3, "NIFTY": 2, "SENSEX": 3, "BANKEX": 3}
 shiftAmountMap = {"MIDCPNIFTY": 1, "FINNIFTY": 1, "BANKNIFTY": 2, "NIFTY": 1, "SENSEX": 2, "BANKEX": 2}
 
-shiftAmount = shiftAmountMap[index]
+shiftAmount = shiftAmountMap[index] if adjSL == 1 else shiftAmountMap[index] + 1
 indexToken = indexTokenMap[index]
 lotSize = lotSizeMap[index]
-SLMap = {0: 0.3, 1: 1, 2: 0}
+SLMap = {0: 0.3, 1: adjSL, 2: 0}
 adjustmentPercent = 0.3
 initialPremium = initialPremiumMap[index]
 mtmStopLoss = mtmSLMap[index]
