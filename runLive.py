@@ -12,20 +12,20 @@ class Live:
         self.strategy = Strategy("sell")
         self.hedge = False
 
-    def callback_method(self, client, currentTime):
-        if not self.hedge and currentTime[:5] >= "09:44":
+    def callback_method(self, client, currentime):
+        if not self.hedge and currentime[:5] >= Utils.startTime[:5]:
             self.subscribeAllTokens(client)
             time.sleep(10)
             self.buyHedge(client)
             self.hedge = True
-            if currentTime[:5] == "09:44":
+            if currentime[:5] == Utils.startTime[:5]:
                 return
         Utils.logger.info("New minute formed, executing computation")
-        if not self.strategy.started and currentTime >= "00:00:00":
+        if not self.strategy.started:
             self.strategy.start(client, client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""),
                                 self.expDate)
-        elif currentTime >= "15:29:00":
-            self.strategy.end(client)
+        # elif currentTime >= "15:29:00":
+        #     self.strategy.end(client)
         elif self.mtmhit or (self.strategy.started and (
                 self.strategy.straddle.getProfit(client) < -Utils.mtmStopLoss)):
             if not self.mtmhit:
@@ -34,7 +34,7 @@ class Live:
                 Utils.logger.info("mtm hit for price " + str(self.mtmhit))
             return
         elif self.strategy.started:
-            self.strategy.piyushAdjustment(client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), client, currentTime)
+            self.strategy.piyushAdjustment(client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), client, currentime)
 
     def subscribeAllTokens(self, client):
         Utils.logger.info("subscribing tokens")
