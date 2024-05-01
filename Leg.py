@@ -23,7 +23,7 @@ class LEG:
         self.shift = strikeDifference if type == "CE" else -strikeDifference
         self.hedge = None
 
-    def getStrike(self, premiumTarget, atm, client):
+    def setStrike(self, premiumTarget, atm, client):
         """
         fetches the strike which has premium closest to premium target.
         """
@@ -40,6 +40,7 @@ class LEG:
             if premium < premiumTarget:
                 self.premium = premium
                 Utils.logger.info("{} fetched with premium {}".format(symbol, premium))
+                self.setLegPars(symbol,client)
                 return symbol
             newStrike = newStrike + self.shift
 
@@ -101,8 +102,7 @@ class LEG:
             else:
                 liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
                                      liveUtils.getQuote(self.symbol, client))
-                symbol = self.getStrike(adjustmentPercent * self.premium, None, client)
-                self.setLegPars(symbol, client)
+                self.setStrike(adjustmentPercent * self.premium, None, client)
                 # self.setHedge(priceDict, 20, tokenData)
                 self.currentAdjustmentLevel += 1
                 return int(initialStrike)
