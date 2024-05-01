@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import Straddle
 import Utils
 import liveUtils
@@ -19,7 +17,6 @@ class Strategy:
 
     def start(self, client, spot, expDate):
         Utils.logger.info("trade started")
-        Utils.logger.info("subscribing tokens")
         self.straddle.setupStraddle(spot, client, expDate)
         Utils.logger.info("straddle mean is " + str(self.straddle.mean))
         # self.straddle.ce.setHedge(priceDict, 20, self.tokenData)
@@ -32,8 +29,9 @@ class Strategy:
         self.started = False
         return self.straddle.exit(client)
 
-    def piyushAdjustment(self, spot, client):
-        if datetime.now().strftime("%S") in ["00", "01"] and int(datetime.now().strftime("%M")) % 10 == 0:
+    def piyushAdjustment(self, spot, client, currentTime):
+        Utils.logger.info("checking for piyush adjustment, spot is " + str(spot))
+        if currentTime[3:5] % 10 == 0:
             Utils.logger.info(
                 "mtm is {} ce premium is {}, pe premium is {}".format(round(self.straddle.getProfit(client), 2),
                                                                       liveUtils.getQuote(self.straddle.ce.token,
@@ -48,6 +46,7 @@ class Strategy:
             return
         self.straddle.reEnter(spot, client)
         self.straddle.adjust(spot, client)
+        Utils.logger.info("piyush adjustment check and adjustments if any done successfully")
 
     def getMTM(self, priceDict):
         return round(self.straddle.getProfit(priceDict), 2)

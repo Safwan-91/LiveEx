@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import Utils
 import liveUtils
 from Utils import *
@@ -40,7 +38,7 @@ class LEG:
             if premium < premiumTarget:
                 self.premium = premium
                 Utils.logger.info("{} fetched with premium {}".format(symbol, premium))
-                self.setLegPars(symbol,client)
+                self.setLegPars(symbol, client)
                 return symbol
             newStrike = newStrike + self.shift
 
@@ -51,7 +49,8 @@ class LEG:
         self.symbol = symbol
         self.premium = liveUtils.getQuote(self.symbol, client)
         liveUtils.placeOrder(client, self.symbol, self.transactionType, self.premium)
-        Utils.logger.info(self.type + " parameters set with strike {} and premium {}".format(self.Strike, self.premium), )
+        Utils.logger.info(
+            self.type + " parameters set with strike {} and premium {}".format(self.Strike, self.premium), )
 
     def getLegProfit(self, client):
         if self.hedge:
@@ -91,7 +90,7 @@ class LEG:
         if self.getLegUnRealizedProfit(client) < - SLMap[self.currentAdjustmentLevel] * self.premium:
             self.realizedProfit += self.getLegUnRealizedProfit(client)
             initialStrike = self.Strike
-            Utils.logger.info(self.type + " leg adjustment at ", datetime.now())
+            Utils.logger.info(self.type + " leg adjustment occured, initiating order placement")
             if self.currentAdjustmentLevel == Utils.noOfAdjustment:
                 self.exit(client)
                 self.premium = 0
@@ -117,7 +116,7 @@ class LEG:
             Utils.logger.info(self.type + " leg rematch at ", datetime.now())
             self.realizedProfit += self.getLegUnRealizedProfit(client)
             liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
-                                     liveUtils.getQuote(self.symbol, client))
+                                 liveUtils.getQuote(self.symbol, client))
             symbol = index + self.exp_date + str(straddleCentre) + self.type
             self.premium = 0
             self.setLegPars(symbol, client)
@@ -156,6 +155,7 @@ class LEG:
         if not self.premium:
             return
         Utils.logger.info("exiting leg")
-        liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType), liveUtils.getQuote(self.symbol, client))
+        liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
+                             liveUtils.getQuote(self.symbol, client))
         if self.hedge:
             self.hedge.exit(client)

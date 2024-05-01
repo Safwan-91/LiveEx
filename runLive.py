@@ -34,7 +34,7 @@ class Live:
                 Utils.logger.info("mtm hit for price " + str(self.mtmhit))
             return
         elif self.strategy.started:
-            self.strategy.piyushAdjustment(client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), client)
+            self.strategy.piyushAdjustment(client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), client, currentTime)
 
     def subscribeAllTokens(self, client):
         Utils.logger.info("subscribing tokens")
@@ -55,3 +55,4 @@ class Live:
         symbolpe = Utils.index + self.expDate + str(int(atm) - 20 * Utils.strikeDifference) + "PE"
         liveUtils.placeOrder(client, symbolce, "buy", 0)
         liveUtils.placeOrder(client, symbolpe, "buy", 0)
+        Utils.logger.info("hedge bought successfully")
