@@ -1,3 +1,4 @@
+import threading
 import time
 import asyncio
 
@@ -53,7 +54,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium):
                 if status != "completed":
                     done = False
                     Utils.logger.warn("order not completed with status" + statuses)
-                    time.sleep(0.1)
+                    time.sleep(0.05)
             if done:
                 Utils.logger.info("order completed for all users")
                 break
@@ -64,18 +65,19 @@ def placeOrder(client, instrument_symbol, transaction_type, premium):
     # for user in users:
     #     user.order(instrument_token, instrument_symbol, transaction_type, premium, quantity)
 
+def execute_in_parallel(func_list, self_instance):
+    threads = []
 
-async def execute_in_parallel(func_list, self_instance):
-    tasks = []
+    # Define a function to be executed in each thread
+    def execute_func(func):
+        func(self_instance)
 
-    # Define a function to be executed in each task
-    async def execute_func(func):
-        await func(self_instance)
-
-    # Create and schedule a task for each function in the func_list
+    # Create and start a thread for each function in the func_list
     for func in func_list:
-        task = asyncio.create_task(execute_func(func))
-        tasks.append(task)
+        thread = threading.Thread(target=execute_func, args=(func,))
+        threads.append(thread)
+        thread.start()
 
-    # Wait for all tasks to finish
-    await asyncio.gather(*tasks)
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
