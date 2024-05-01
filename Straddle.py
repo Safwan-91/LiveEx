@@ -1,4 +1,3 @@
-import Utils
 from Leg import *
 
 
@@ -15,12 +14,15 @@ class STRADDLE:
         return self.ce.getLegProfit(client) + self.pe.getLegProfit(client)
 
     def setupStraddle(self, spot, client, expDate):
-        Utils.logger.info("setting up straddle at " + str(spot))
+        Utils.logger.info("setting up initial position at " + str(spot))
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         self.ce.exp_date = expDate
         self.pe.exp_date = expDate
-        self.ce.setStrike(initialPremium, atm, client)
-        self.pe.setStrike(initialPremium, atm, client)
+        def set_ce_strike():
+            self.ce.setStrike(initialPremium, atm, client)
+        def set_pe_strike():
+            self.pe.setStrike(initialPremium, atm, client)
+        liveUtils.execute_in_parallel([set_ce_strike, set_pe_strike], self)
         self.strikeStack = []
         self.mean.append(spot)
 
