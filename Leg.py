@@ -1,3 +1,5 @@
+import threading
+
 import Utils
 import liveUtils
 from Utils import *
@@ -92,7 +94,7 @@ class LEG:
             initialStrike = self.Strike
             Utils.logger.info(self.type + " leg adjustment occured, initiating order placement")
             if self.currentAdjustmentLevel == Utils.noOfAdjustment:
-                self.exit(client)
+                threading.Thread(target=self.exit, args=(client,))
                 self.premium = 0
                 self.currentAdjustmentLevel += 1
                 # self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(client)
