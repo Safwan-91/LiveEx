@@ -1,8 +1,7 @@
-import datetime
 import logging
 from datetime import datetime
 
-logPath = "C:/Users/Safwan PC/Desktop/logs"
+logPath = "C:/Users/Administrator/Desktop/logs"
 formatter = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(filename=logPath+datetime.now().strftime('%Y-%m-%d')+'.log', level=logging.DEBUG, format=formatter)
 logger = logging.getLogger(__name__)
@@ -11,7 +10,7 @@ console_handler.setFormatter(logging.Formatter(formatter))
 logger.addHandler(console_handler)
 
 index = "NIFTY"
-expDate = ""
+expDate = "24502"
 indexExchange = "NSE"
 fnoExchange = "NFO"
 adjustmentShift = "True"
