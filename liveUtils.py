@@ -1,10 +1,5 @@
-import pickle
 import time
-from datetime import datetime
-from urllib.request import urlopen
-import time as tm
-
-import pandas as pd
+import asyncio
 
 import Utils
 
@@ -13,80 +8,74 @@ def getQuote(symbol, client):
     tryNo = 0
     while tryNo <= 5:
         try:
-            # print("time before quote call " + str(datetime.now()) + " try no ", tryNo)
+            Utils.logger.info("fetching quote for {} for {}th try".format(symbol, tryNo))
             ltp = client.IB_LTP(Utils.fnoExchange, symbol, "")
-            # print("time after quote call ", datetime.now())
+            Utils.logger.info("quote fetched with ltp "+str(ltp))
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
             if ltp == 0:
-                print("get quote attempt failed ", ltp)
+                Utils.logger.info("get quote attempt failed ", ltp)
                 client.IB_Subscribe(Utils.fnoExchange, symbol, "")
                 tryNo += 1
                 time.sleep(0.5)
                 continue
             return float(ltp)
         except Exception as e:
-            print("Exception when calling get Quote api->quotes: %s\n" % e)
+            Utils.logger.error("Exception when calling get Quote api->quotes: %s\n" % e)
             tryNo += 1
             time.sleep(1)
             if tryNo == 5:
                 return e
 
 
-def loadTokenData():
-    url = "https://lapi.kotaksecurities.com/wso2-scripmaster/v1/prod/" + datetime.now().strftime('%Y-%m-%d') + "/transformed/"+Utils.indexExchange.lower()+"_fo.csv"
-    response = urlopen(url)
-    inst = pd.read_csv(response, sep=",")
-    column_mapping = {'pSymbolName': 'instrumentName', 'pTrdSymbol': 'symbol', 'pSymbol': 'token'}
-    inst.rename(columns=column_mapping, inplace=True)
-    inst["expiry"] = inst.symbol.str[9:14]
-    return inst
-
-
-def dump(obj, name):
-    fileObj = open(name + '.obj', 'wb')
-    pickle.dump(obj, fileObj)
-    fileObj.close()
-
-
-def load(name):
-    dbfile = open(name + '.obj', 'rb')
-    db = pickle.load(dbfile)
-    dbfile.close()
-    return db
-
-
-def placeOrder(client, instrument_token, instrument_symbol, transaction_type, premium, quantity):
-    print("time before order call " + str(datetime.now()))
+def placeOrder(client, instrument_symbol, transaction_type, premium):
+    Utils.logger.info("placing {} order for {} at {}".format(transaction_type, instrument_symbol, premium))
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     orderID = client.IB_MappedOrderAdv(SignalID=0,
-                               StrategyTag="OPTIONSPLAYPYSAF",
-                               SourceSymbol=instrument_token,
-                               TransactionType=transaction_type,
-                               OrderType="MARKET",
-                               ProductType="NRML",
-                               Price="",
-                               TriggerPrice="",
-                               Quantity=Utils.lotSize,
-                               ProfitValue="",
-                               StoplossValue="",
-                               SLTrailingValue="",
-                               SignalLTP=0,
-                               OptionsType="")
-    print("orderId is ", orderID)
+                                       StrategyTag="OPTIONSPLAYPYSAF",
+                                       SourceSymbol=instrument_symbol,
+                                       TransactionType=transaction_type,
+                                       OrderType="MARKET",
+                                       ProductType="NRML",
+                                       Price="",
+                                       TriggerPrice="",
+                                       Quantity=Utils.lotSize,
+                                       ProfitValue="",
+                                       StoplossValue="",
+                                       SLTrailingValue="",
+                                       SignalLTP=0,
+                                       OptionsType="")
+    Utils.logger.info("order placed with orderID " + str(orderID))
     while True:
         try:
-            statuses = client.IB_OrderStatus(orderID).split(",")
+            statuses = client.IB_OrderStatus(orderID)
+            done = True
+            for status in statuses.split(","):
+                if status != "completed":
+                    done = False
+                    Utils.logger.warn("order not completed with status" + statuses)
+                    time.sleep(0.1)
+            if done:
+                Utils.logger.info("order completed for all users")
+                break
         except Exception as e:
-            print(e)
+            Utils.logger.error(e)
             time.sleep(1)
             continue
-        done = True
-        for status in statuses:
-            if status != "completed":
-                done = False
-        if done:
-            break
-    print(transaction_type + " : " + str(instrument_token) + " at " + str(premium))
-    print("time after order call " + str(datetime.now()))
     # for user in users:
     #     user.order(instrument_token, instrument_symbol, transaction_type, premium, quantity)
+
+
+async def execute_in_parallel(func_list, self_instance):
+    tasks = []
+
+    # Define a function to be executed in each task
+    async def execute_func(func):
+        await func(self_instance)
+
+    # Create and schedule a task for each function in the func_list
+    for func in func_list:
+        task = asyncio.create_task(execute_func(func))
+        tasks.append(task)
+
+    # Wait for all tasks to finish
+    await asyncio.gather(*tasks)

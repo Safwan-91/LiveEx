@@ -1,8 +1,20 @@
+import datetime
+import logging
+from datetime import datetime
+
+logPath = "C:/Users/Safwan PC/Desktop/logs"
+formatter = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(filename=logPath+datetime.now().strftime('%Y-%m-%d')+'.log', level=logging.DEBUG, format=formatter)
+logger = logging.getLogger(__name__)
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter(formatter))
+logger.addHandler(console_handler)
+
 index = "NIFTY"
+expDate = ""
 indexExchange = "NSE"
 fnoExchange = "NFO"
 adjustmentShift = "True"
-
 
 initialPremiumMap = {"MIDCPNIFTY": 25, "FINNIFTY": 40, "BANKNIFTY": 100, "NIFTY": 50, "SENSEX": 163, "BANKEX": 115}
 mtmSLMap = {"MIDCPNIFTY": 10, "FINNIFTY": 30, "BANKNIFTY": 80, "NIFTY": 40, "SENSEX": 130, "BANKEX": 90}

@@ -1,4 +1,3 @@
-import calendar
 from datetime import datetime
 
 import Utils
@@ -17,23 +16,18 @@ class LEG:
         self.transactionType = transactionType
         self.Strike = None
         self.exp_date = None
+        self.symbol = None
         self.premium = None
-        self.token = None
         self.currentAdjustmentLevel = 0
         self.realizedProfit = 0
-        self.noOfAdjustments = 1
         self.shift = strikeDifference if type == "CE" else -strikeDifference
         self.hedge = None
 
-    def getStrike(self, premiumTarget, atm, tokenData, client):
+    def getStrike(self, premiumTarget, atm, client):
         """
         fetches the strike which has premium closest to premium target.
-        :param priceDict:
-        :param premiumTarget: always less than self.premium.
-        :param bankNiftyData:
-        :param time:
-        :return: symbol eg. BANKNIFTY29NOV40000CE
         """
+        Utils.logger.info("fetching strike for {} side with premium {}".format(self.type, premiumTarget))
         intialStrike = atm if atm else int(self.Strike)
         newStrike = intialStrike
         while abs(intialStrike - newStrike) <= 8000:
@@ -42,21 +36,21 @@ class LEG:
             try:
                 premium = liveUtils.getQuote(symbol, client)
             except Exception as e:
-                print(e)
+                Utils.logger.error(e)
             if premium < premiumTarget:
                 self.premium = premium
+                Utils.logger.info("{} fetched with premium {}".format(symbol, premium))
                 return symbol
             newStrike = newStrike + self.shift
 
-    def setLegPars(self, symbol, tokenData, client, users):
+    def setLegPars(self, symbol, client):
         self.Strike = symbol[-7:-2]
-        # if self.transactionType == "sell" and not self.token:
+        # if self.transactionType == "sell" and not self.symbol:
         #     self.setHedge(20, tokenData, client, users)
-        self.token = symbol
-        if not self.premium:
-            self.premium = liveUtils.getQuote(self.token, client)
-        liveUtils.placeOrder(client, self.token, self.getSymbol(), self.transactionType, self.premium, 1)
-        print(self.type + " parameters set with strike {} and premium {}".format(self.Strike, self.premium), )
+        self.symbol = symbol
+        self.premium = liveUtils.getQuote(self.symbol, client)
+        liveUtils.placeOrder(client, self.symbol, self.transactionType, self.premium)
+        Utils.logger.info(self.type + " parameters set with strike {} and premium {}".format(self.Strike, self.premium), )
 
     def getLegProfit(self, client):
         if self.hedge:
@@ -67,25 +61,25 @@ class LEG:
     def getLegUnRealizedProfit(self, client):
         try:
             if self.premium and self.transactionType == "sell":
-                return self.premium - liveUtils.getQuote(self.token, client)
+                return self.premium - liveUtils.getQuote(self.symbol, client)
             elif self.premium and self.transactionType == "buy":
-                return liveUtils.getQuote(self.token, client) - self.premium
+                return liveUtils.getQuote(self.symbol, client) - self.premium
             else:
                 return 0
         except Exception as e:
-            print("exception occurred", e)
+            Utils.logger.info("exception occurred", e)
             return self.premium
 
     def flush(self):
         self.Strike = None
         self.exp_date = None
         self.premium = 0
-        self.token = None
+        self.symbol = None
         self.currentAdjustmentLevel = 0
         self.realizedProfit = 0
         self.hedge = None
 
-    def reExecute(self, tokenData, client, users):
+    def reExecute(self, client):
         """
         when the current leg hits SL we do an adjustment in the leg to a farther strike
         :param client:
@@ -96,51 +90,48 @@ class LEG:
         if self.getLegUnRealizedProfit(client) < - SLMap[self.currentAdjustmentLevel] * self.premium:
             self.realizedProfit += self.getLegUnRealizedProfit(client)
             initialStrike = self.Strike
-            print(self.type + " leg adjustment at ", datetime.now())
-            if self.currentAdjustmentLevel == self.noOfAdjustments:
-                self.exit(client, users)
+            Utils.logger.info(self.type + " leg adjustment at ", datetime.now())
+            if self.currentAdjustmentLevel == Utils.noOfAdjustment:
+                self.exit(client)
                 self.premium = 0
                 self.currentAdjustmentLevel += 1
                 # self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(client)
                 # self.hedge.premium = 0
                 return int(initialStrike)
             else:
-                liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
-                                     liveUtils.getQuote(self.token, client), 1)
-                symbol = self.getStrike(adjustmentPercent * self.premium, None, tokenData, client)
-                self.setLegPars(symbol, tokenData, client, users)
+                liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
+                                     liveUtils.getQuote(self.symbol, client))
+                symbol = self.getStrike(adjustmentPercent * self.premium, None, client)
+                self.setLegPars(symbol, client)
                 # self.setHedge(priceDict, 20, tokenData)
                 self.currentAdjustmentLevel += 1
                 return int(initialStrike)
         return 0
 
-    def reEnter(self, straddleCentre, tokenData, client, users):
+    def reEnter(self, straddleCentre, client):
         """
         when the spot price comes back to the intial straddle or strangle price we do a reentry.
-        :param time:
-        :param straddleCentre:
-        :param bankNiftyData:
         :return:
         """
         if straddleCentre:
-            print(self.type + " leg rematch at ", datetime.now())
+            Utils.logger.info(self.type + " leg rematch at ", datetime.now())
             self.realizedProfit += self.getLegUnRealizedProfit(client)
-            liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
-                                     liveUtils.getQuote(self.token, client), 1)
+            liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
+                                     liveUtils.getQuote(self.symbol, client))
             symbol = index + self.exp_date + str(straddleCentre) + self.type
             self.premium = 0
-            self.setLegPars(symbol, tokenData, client, users)
+            self.setLegPars(symbol, client)
             # self.setHedge(priceDict, 20, tokenData)
             self.currentAdjustmentLevel -= 1
             return 0
 
-    def shiftIn(self, client, tokenData, users):
-        print("shifting in ", self.type)
+    def shiftIn(self, client):
+        Utils.logger.info("shifting in ", self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(client)
-        liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType),
-                             liveUtils.getQuote(self.token, client), 1)
+        liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
+                             liveUtils.getQuote(self.symbol, client))
         symbol = Utils.index + self.exp_date + str(int(self.Strike) - Utils.shiftAmount * self.shift) + self.type
-        self.setLegPars(symbol, tokenData, client, users)
+        self.setLegPars(symbol, client)
 
     def setHedge(self, hedgeDist, tokenData, client, users):
         transactionType = "buy" if self.transactionType == "sell" else "sell"
@@ -152,28 +143,19 @@ class LEG:
         else:
             hedgestrike = str(int(self.Strike) + hedgeDist * self.shift)
         symbol = index + self.exp_date + hedgestrike + self.type
-        print("hedge", end=" ")
-        self.hedge.setLegPars(symbol, tokenData, client, users)
+        Utils.logger.info("hedge", end=" ")
+        self.hedge.setLegPars(symbol, client)
 
     def updatePremium(self, client):
         self.realizedProfit += self.getLegUnRealizedProfit(client)
-        self.premium = liveUtils.getQuote(self.token, client)
+        self.premium = liveUtils.getQuote(self.symbol, client)
         if self.hedge:
             self.hedge.updatePremium(client)
 
-    def exit(self, client, users):
+    def exit(self, client):
         if not self.premium:
             return
-        print("exiting leg")
-        liveUtils.placeOrder(client, self.token, self.getSymbol(), getOppTransaction(self.transactionType), liveUtils.getQuote(self.token, client), 1)
+        Utils.logger.info("exiting leg")
+        liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType), liveUtils.getQuote(self.symbol, client))
         if self.hedge:
-            self.hedge.exit(client, users)
-
-    def getSymbol(self):
-        map = {"O": 10, "N": 11, "D": 12}
-        if self.exp_date[2].isnumeric():
-            m = int(self.exp_date[2]) if self.exp_date[2] not in map else map[self.exp_date[2]]
-            expDate = self.exp_date[-2:]+calendar.month_abbr[m].upper()+self.exp_date[:2]
-        else:
-            expDate = self.exp_date
-        return Utils.index+expDate+self.type[0]+self.Strike if Utils.index != "SENSEX" else Utils.index+expDate+self.Strike+self.type
+            self.hedge.exit(client)
