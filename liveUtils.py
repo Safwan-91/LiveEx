@@ -1,6 +1,5 @@
 import threading
 import time
-import asyncio
 
 import Utils
 
@@ -9,12 +8,12 @@ def getQuote(symbol, client):
     tryNo = 0
     while tryNo <= 5:
         try:
-            Utils.logger.info("fetching quote for {} for {}th try".format(symbol, tryNo))
+            Utils.logger.debug("fetching quote for {} for {}th try".format(symbol, tryNo))
             ltp = client.IB_LTP(Utils.fnoExchange, symbol, "")
-            Utils.logger.info("quote fetched with ltp "+str(ltp))
+            Utils.logger.debug("quote fetched with ltp "+str(ltp))
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
             if ltp == 0:
-                Utils.logger.info("get quote attempt failed ", ltp)
+                Utils.logger.debug("get quote attempt failed ", ltp)
                 client.IB_Subscribe(Utils.fnoExchange, symbol, "")
                 tryNo += 1
                 time.sleep(0.5)
@@ -32,7 +31,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium):
     Utils.logger.info("placing {} order for {} at {}".format(transaction_type, instrument_symbol, premium))
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     orderID = client.IB_MappedOrderAdv(SignalID=0,
-                                       StrategyTag="OPTIONSPLAYPYSAF",
+                                       StrategyTag=Utils.strategyTag,
                                        SourceSymbol=instrument_symbol,
                                        TransactionType=transaction_type,
                                        OrderType="MARKET",
@@ -45,7 +44,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium):
                                        SLTrailingValue="",
                                        SignalLTP=0,
                                        OptionsType="")
-    Utils.logger.info("order placed with orderID " + str(orderID))
+    Utils.logger.debug("order placed with orderID " + str(orderID))
     while True:
         try:
             statuses = client.IB_OrderStatus(orderID)
@@ -55,6 +54,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium):
                     done = False
                     Utils.logger.warn("order not completed with status" + statuses)
                     time.sleep(0.05)
+                    break
             if done:
                 Utils.logger.info("order completed for all users")
                 break
