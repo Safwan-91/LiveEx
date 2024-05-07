@@ -94,7 +94,7 @@ class LEG:
             initialStrike = self.Strike
             Utils.logger.info(self.type + " leg adjustment occured, initiating order placement")
             if self.currentAdjustmentLevel == Utils.noOfAdjustment:
-                threading.Thread(target=self.exit, args=(client,))
+                threading.Thread(target=self.exit, args=(client,)).start()
                 self.premium = 0
                 self.currentAdjustmentLevel += 1
                 # self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(client)
@@ -115,7 +115,7 @@ class LEG:
         :return:
         """
         if straddleCentre:
-            Utils.logger.info(self.type + " leg rematch at ", datetime.now())
+            Utils.logger.info(self.type + " leg rematch occured, initiating rematch ")
             self.realizedProfit += self.getLegUnRealizedProfit(client)
             liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
                                  liveUtils.getQuote(self.symbol, client))
@@ -127,14 +127,14 @@ class LEG:
             return 0
 
     def shiftIn(self, client):
-        Utils.logger.info("shifting in ", self.type)
+        Utils.logger.info("shifting in initialized for "+ self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(client)
         liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
                              liveUtils.getQuote(self.symbol, client))
         symbol = Utils.index + self.exp_date + str(int(self.Strike) - Utils.shiftAmount * self.shift) + self.type
         self.setLegPars(symbol, client)
 
-    def setHedge(self, hedgeDist, tokenData, client, users):
+    def setHedge(self, hedgeDist, client):
         transactionType = "buy" if self.transactionType == "sell" else "sell"
         self.hedge = LEG(self.type, transactionType) if not self.hedge else self.hedge
         self.hedge.type = self.type
@@ -148,6 +148,7 @@ class LEG:
         self.hedge.setLegPars(symbol, client)
 
     def updatePremium(self, client):
+        Utils.logger.info("updating premium for " + self.symbol)
         self.realizedProfit += self.getLegUnRealizedProfit(client)
         self.premium = liveUtils.getQuote(self.symbol, client)
         if self.hedge:

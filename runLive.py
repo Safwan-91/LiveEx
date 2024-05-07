@@ -35,17 +35,22 @@ class Live:
             return
         elif self.strategy.started:
             self.strategy.piyushAdjustment(client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), client, currentime)
+        self.subscribeAllTokens(client)
 
     def subscribeAllTokens(self, client):
         Utils.logger.info("subscribing tokens")
         client.IB_Subscribe(Utils.indexExchange, Utils.indexToken, "")
-        spot = client.IB_LTP(Utils.indexExchange, Utils.indexToken, "")
-        atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
+        atm = (round(float(client.IB_LTP(Utils.indexExchange, Utils.indexToken, "")) / Utils.strikeDifference) * Utils.strikeDifference) if not self.strategy.started else None
         for i in range(10):
-            symbolce = Utils.index + self.expDate + str(int(atm) + i * Utils.strikeDifference) + "CE"
-            symbolpe = Utils.index + self.expDate + str(int(atm) - i * Utils.strikeDifference) + "PE"
+            if atm:
+                symbolce = Utils.index + self.expDate + str(int(atm) + i * Utils.strikeDifference) + "CE"
+                symbolpe = Utils.index + self.expDate + str(int(atm) - i * Utils.strikeDifference) + "PE"
+            else:
+                symbolce = Utils.index + self.expDate + str(int(self.strategy.straddle.ce.Strike) + i * Utils.strikeDifference) + "CE"
+                symbolpe = Utils.index + self.expDate + str(int(self.strategy.straddle.pe.Strike) - i * Utils.strikeDifference) + "PE"
             client.IB_Subscribe(Utils.fnoExchange, symbolce, "")
             client.IB_Subscribe(Utils.fnoExchange, symbolpe, "")
+        Utils.logger.info("all tokens subscribed")
 
     def buyHedge(self, client):
         Utils.logger.info("buying Hedge")
