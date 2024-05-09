@@ -1,5 +1,6 @@
 import threading
 import time
+from Utils import executor
 
 import Utils
 
@@ -10,7 +11,7 @@ def getQuote(symbol, client):
         try:
             Utils.logger.debug("fetching quote for {} for {}th try".format(symbol, tryNo))
             ltp = client.IB_LTP(Utils.fnoExchange, symbol, "")
-            Utils.logger.debug("quote fetched with ltp "+str(ltp))
+            Utils.logger.debug("quote fetched with ltp " + str(ltp))
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
             if ltp == 0:
                 Utils.logger.debug("get quote attempt failed ", ltp)
@@ -65,19 +66,18 @@ def placeOrder(client, instrument_symbol, transaction_type, premium):
     # for user in users:
     #     user.order(instrument_token, instrument_symbol, transaction_type, premium, quantity)
 
-def execute_in_parallel(func_list, self_instance):
-    threads = []
 
+def execute_in_parallel(func_list, *args):
     # Define a function to be executed in each thread
     def execute_func(func):
-        func(self_instance)
+        return func(*args)
 
-    # Create and start a thread for each function in the func_list
+    results = []
     for func in func_list:
-        thread = threading.Thread(target=execute_func, args=(func,))
-        threads.append(thread)
-        thread.start()
+        # Pass parameters to sub_task
+        results.append(executor.submit(execute_func, func))
 
-    # Wait for all threads to finish
-    for thread in threads:
-        thread.join()
+    # Wait for all sub-tasks to complete
+    for future in results:
+        future.result()
+    return results
