@@ -11,15 +11,15 @@ class STRADDLE:
         self.buy = True if transactionType == "buy" else False
 
     def getProfit(self, client):
-        result = liveUtils.execute_in_parallel([self.ce.getLegProfit, self.pe.getLegProfit], self, client)
-        return self.ce.getLegProfit(client) + self.pe.getLegProfit(client)
+        result = liveUtils.execute_in_parallel([self.ce.getLegProfit, self.pe.getLegProfit], client)
+        return result[0].result + result[1].result
 
     def setupStraddle(self, spot, client, expDate):
         Utils.logger.info("setting up initial position at " + str(spot))
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         self.ce.exp_date = expDate
         self.pe.exp_date = expDate
-        liveUtils.execute_in_parallel([self.ce.setStrike, self.pe.setStrike], self, initialPremium, atm, client)
+        liveUtils.execute_in_parallel([self.ce.setStrike, self.pe.setStrike], initialPremium, atm, client)
         self.strikeStack = []
         self.mean.append(spot)
 
