@@ -6,7 +6,8 @@ import liveUtils
 
 
 class Live:
-    def __init__(self):
+    def __init__(self, strategyNo):
+        self.strategyNo = strategyNo
         self.mtmhit = None
         self.expDate = Utils.expDate
         self.strategy = Strategy("sell")
@@ -58,6 +59,6 @@ class Live:
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         symbolce = Utils.index + self.expDate + str(int(atm) + 20 * Utils.strikeDifference) + "CE"
         symbolpe = Utils.index + self.expDate + str(int(atm) - 20 * Utils.strikeDifference) + "PE"
-        liveUtils.placeOrder(client, symbolce, "buy", 0)
-        liveUtils.placeOrder(client, symbolpe, "buy", 0)
+        # liveUtils.placeOrder(client, symbolce, "buy", 0)
+        # liveUtils.placeOrder(client, symbolpe, "buy", 0)
         Utils.logger.info("hedge bought successfully")

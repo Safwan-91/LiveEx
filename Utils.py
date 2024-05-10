@@ -2,11 +2,14 @@ import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
-index = "FINNIFTY"
-expDate = "24507"
-indexExchange = "NSE"
-fnoExchange = "NFO"
-startTime = "10:44:00"
+index = "SENSEX"
+expDate = "24510"
+indexExchange = "BSE"
+fnoExchange = "BFO"
+
+params = {}
+
+startTime = "00:00:00"
 adjSL = 2
 strategyTag = "OPTIONSPLAY1045SL2"
 
@@ -35,7 +38,6 @@ SLMap = {0: 0.3, 1: adjSL, 2: 0}
 adjustmentPercent = 0.3
 initialPremium = initialPremiumMap[index]
 mtmStopLoss = mtmSLMap[index]
-path = "C:\\Users\\Safwan PC\\banknifty_new\\"
 strikeDifference = strikeDifferenceMap[index]
 noOfAdjustment = 1
 oneSideFullHitFlag = True
