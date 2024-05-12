@@ -1,4 +1,4 @@
-import multiprocessing
+import threading
 
 import Utils
 from runLive import Live
@@ -11,7 +11,7 @@ def runStrategy(strategyNo, client):
     currentTime = datetime.now().strftime("%H:%M:%S")
     lastMin = None
     while "00:15:00" <= currentTime <= "15:30:00":
-        if currentTime[3:5] != lastMin and currentTime >= Utils.startTime:
+        if currentTime[3:5] != lastMin and currentTime >= Utils.startTime[strategyNo]:
             runLive.callback_method(client, currentTime)
             lastMin = currentTime[3:5]
         currentTime = datetime.now().strftime("%H:%M:%S")
@@ -20,10 +20,9 @@ def runStrategy(strategyNo, client):
 
 
 if __name__ == '__main__':
-    pool = multiprocessing.Pool(processes=4)
     Utils.logger.info("Starting the program")
     client = IB_APIS("http://localhost:21000")
     client.IB_Subscribe(Utils.indexExchange, Utils.indexToken, "")
     for i in range(4):
-        pool.apply_async(runStrategy(i, client))
+        threading.Thread(target = runStrategy, args=(i, client)).start()
 

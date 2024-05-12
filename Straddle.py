@@ -2,17 +2,17 @@ from Leg import *
 
 
 class STRADDLE:
-    def __init__(self, transactionType):
-        self.ce = LEG("CE", transactionType)
-        self.pe = LEG("PE", transactionType)
+    def __init__(self, transactionType, strategyNo):
+        self.strategyNo = strategyNo
+        self.ce = LEG("CE", transactionType, strategyNo)
+        self.pe = LEG("PE", transactionType, strategyNo)
         self.realizedProfit = 0
         self.strikeStack = []
         self.mean = []
         self.buy = True if transactionType == "buy" else False
 
     def getProfit(self, client):
-        result = liveUtils.execute_in_parallel([self.ce.getLegProfit, self.pe.getLegProfit], client)
-        return result[0].result + result[1].result
+        return self.ce.getLegProfit(client) + self.pe.getLegProfit(client)
 
     def setupStraddle(self, spot, client, expDate):
         Utils.logger.info("setting up initial position at " + str(spot))

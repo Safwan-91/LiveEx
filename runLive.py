@@ -10,16 +10,16 @@ class Live:
         self.strategyNo = strategyNo
         self.mtmhit = None
         self.expDate = Utils.expDate
-        self.strategy = Strategy("sell")
+        self.strategy = Strategy("sell", strategyNo)
         self.hedge = False
 
     def callback_method(self, client, currentime):
-        if not self.hedge and currentime[:5] >= Utils.startTime[:5]:
+        if not self.hedge and currentime[:5] >= Utils.startTime[self.strategyNo][:5]:
             self.subscribeAllTokens(client)
             time.sleep(10)
             self.buyHedge(client)
             self.hedge = True
-            if currentime[:5] == Utils.startTime[:5]:
+            if currentime[:5] == Utils.startTime[self.strategyNo][:5]:
                 return
         Utils.logger.info("New minute formed, executing computation")
         if not self.strategy.started:
