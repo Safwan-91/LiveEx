@@ -5,8 +5,9 @@ import liveUtils
 
 class Strategy:
 
-    def __init__(self, transactionType):
-        self.straddle = Straddle.STRADDLE(transactionType)
+    def __init__(self, transactionType, strategyNo):
+        self.strategyNo = strategyNo
+        self.straddle = Straddle.STRADDLE(transactionType, strategyNo)
         self.mtm = 0
         self.rematchStack = []
         self.shift = 200

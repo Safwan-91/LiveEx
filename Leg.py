@@ -11,7 +11,7 @@ def getOppTransaction(transactionType):
 
 class LEG:
 
-    def __init__(self, type, transactionType):
+    def __init__(self, type, transactionType, strategyNo):
         self.type = type
         self.transactionType = transactionType
         self.Strike = None
@@ -22,6 +22,7 @@ class LEG:
         self.realizedProfit = 0
         self.shift = strikeDifference if type == "CE" else -strikeDifference
         self.hedge = None
+        self.strategyNo = strategyNo
 
     def setStrike(self, premiumTarget, atm, client):
         """
@@ -50,7 +51,7 @@ class LEG:
         #     self.setHedge(20, tokenData, client, users)
         self.symbol = symbol
         self.premium = liveUtils.getQuote(self.symbol, client)
-        liveUtils.placeOrder(client, self.symbol, self.transactionType, self.premium)
+        liveUtils.placeOrder(client, self.symbol, self.transactionType, self.premium, self.strategyNo)
         Utils.logger.info(
             self.type + " parameters set with strike {} and premium {}".format(self.Strike, self.premium), )
 
@@ -89,7 +90,7 @@ class LEG:
         :param tokenData:
         :return:
         """
-        if self.getLegUnRealizedProfit(client) < - SLMap[self.currentAdjustmentLevel] * self.premium:
+        if self.getLegUnRealizedProfit(client) < - SLMap[self.currentAdjustmentLevel][self.strategyNo] * self.premium:
             self.realizedProfit += self.getLegUnRealizedProfit(client)
             initialStrike = self.Strike
             Utils.logger.info(self.type + " leg adjustment occured, initiating order placement")
@@ -102,7 +103,7 @@ class LEG:
                 return int(initialStrike)
             else:
                 liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
-                                     liveUtils.getQuote(self.symbol, client))
+                                     liveUtils.getQuote(self.symbol, client), self.strategyNo)
                 self.setStrike(adjustmentPercent * self.premium, None, client)
                 # self.setHedge(priceDict, 20, tokenData)
                 self.currentAdjustmentLevel += 1
@@ -118,7 +119,7 @@ class LEG:
             Utils.logger.info(self.type + " leg rematch occured, initiating rematch ")
             self.realizedProfit += self.getLegUnRealizedProfit(client)
             liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
-                                 liveUtils.getQuote(self.symbol, client))
+                                 liveUtils.getQuote(self.symbol, client), self.strategyNo)
             symbol = index + self.exp_date + str(straddleCentre) + self.type
             self.premium = 0
             self.setLegPars(symbol, client)
@@ -130,7 +131,7 @@ class LEG:
         Utils.logger.info("shifting in initialized for "+ self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(client)
         liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
-                             liveUtils.getQuote(self.symbol, client))
+                             liveUtils.getQuote(self.symbol, client), self.strategyNo)
         symbol = Utils.index + self.exp_date + str(int(self.Strike) - Utils.shiftAmount * self.shift) + self.type
         self.setLegPars(symbol, client)
 
@@ -159,6 +160,6 @@ class LEG:
             return
         Utils.logger.info("exiting leg")
         liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
-                             liveUtils.getQuote(self.symbol, client))
+                             liveUtils.getQuote(self.symbol, client), self.strategyNo)
         if self.hedge:
             self.hedge.exit(client)
