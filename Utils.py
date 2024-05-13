@@ -2,10 +2,10 @@ import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
-index = "BANKEX"
-expDate = "24513"
-indexExchange = "BSE"
-fnoExchange = "BFO"
+index = "FINNIFTY"
+expDate = "24514"
+indexExchange = "NSE"
+fnoExchange = "NFO"
 
 startTime = ["00:04:00", "00:04:00", "00:04:00", "10:44:00"]
 adjSL = [1,2,1,2]
