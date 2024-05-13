@@ -13,7 +13,7 @@ strategyTag = ["OPTIONSPLAY945SL1", "OPTIONSPLAY945SL2", "OPTIONSPLAY1045SL1", "
 
 executor = ThreadPoolExecutor()
 
-logPath = "C:/Users/Administrator/Desktop/logs/"
+logPath = "C:/Users/Safwan PC/Desktop/logs/"
 formatter = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(filename=logPath+datetime.now().strftime('%Y-%m-%d')+'.log', level=logging.DEBUG, format=formatter)
 logger = logging.getLogger(__name__)

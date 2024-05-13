@@ -15,7 +15,7 @@ class STRADDLE:
         return self.ce.getLegProfit(client) + self.pe.getLegProfit(client)
 
     def setupStraddle(self, spot, client, expDate):
-        Utils.logger.info("setting up initial position at " + str(spot))
+        Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"setting up initial position at " + str(spot))
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         self.ce.exp_date = expDate
         self.pe.exp_date = expDate
@@ -42,12 +42,12 @@ class STRADDLE:
             self.mean.pop()
             self.pe.updatePremium(client)
             self.ce.reEnter(self.strikeStack.pop(), client)
-            Utils.logger.info("after rematch the premiums are, ce - {}, pe - {}".format(self.ce.premium, self.pe.premium))
+            Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"after rematch the premiums are, ce - {}, pe - {}".format(self.ce.premium, self.pe.premium))
         elif self.pe.currentAdjustmentLevel >= 1 and spot > self.mean[-2]:
             self.mean.pop()
             self.ce.updatePremium(client)
             self.pe.reEnter(self.strikeStack.pop(), client)
-            Utils.logger.info("after rematch the premiums are, ce - {}, pe - {}".format(self.ce.premium, self.pe.premium))
+            Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"after rematch the premiums are, ce - {}, pe - {}".format(self.ce.premium, self.pe.premium))
 
     def exit(self, client):
         profit = self.getProfit(client)
