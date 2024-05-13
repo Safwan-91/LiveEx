@@ -28,7 +28,7 @@ class LEG:
         """
         fetches the strike which has premium closest to premium target.
         """
-        Utils.logger.info("fetching strike for {} side with premium {}".format(self.type, premiumTarget))
+        Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"fetching strike for {} side with premium {}".format(self.type, premiumTarget))
         intialStrike = atm if atm else int(self.Strike)
         newStrike = intialStrike
         while abs(intialStrike - newStrike) <= 8000:
@@ -40,7 +40,7 @@ class LEG:
                 Utils.logger.error(e)
             if premium < premiumTarget:
                 self.premium = premium
-                Utils.logger.info("{} fetched with premium {}".format(symbol, premium))
+                Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"{} fetched with premium {}".format(symbol, premium))
                 self.setLegPars(symbol, client)
                 return symbol
             newStrike = newStrike + self.shift
@@ -52,7 +52,7 @@ class LEG:
         self.symbol = symbol
         self.premium = liveUtils.getQuote(self.symbol, client)
         liveUtils.placeOrder(client, self.symbol, self.transactionType, self.premium, self.strategyNo)
-        Utils.logger.info(
+        Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+
             self.type + " parameters set with strike {} and premium {}".format(self.Strike, self.premium), )
 
     def getLegProfit(self, client):
@@ -70,7 +70,7 @@ class LEG:
             else:
                 return 0
         except Exception as e:
-            Utils.logger.info("exception occurred", e)
+            Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"exception occurred", e)
             return self.premium
 
     def flush(self):
@@ -93,7 +93,7 @@ class LEG:
         if self.getLegUnRealizedProfit(client) < - SLMap[self.currentAdjustmentLevel][self.strategyNo] * self.premium:
             self.realizedProfit += self.getLegUnRealizedProfit(client)
             initialStrike = self.Strike
-            Utils.logger.info(self.type + " leg adjustment occured, initiating order placement")
+            Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+self.type + " leg adjustment occured, initiating order placement")
             if self.currentAdjustmentLevel == Utils.noOfAdjustment:
                 threading.Thread(target=self.exit, args=(client,)).start()
                 self.premium = 0
@@ -116,7 +116,7 @@ class LEG:
         :return:
         """
         if straddleCentre:
-            Utils.logger.info(self.type + " leg rematch occured, initiating rematch ")
+            Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+self.type + " leg rematch occured, initiating rematch ")
             self.realizedProfit += self.getLegUnRealizedProfit(client)
             liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
                                  liveUtils.getQuote(self.symbol, client), self.strategyNo)
@@ -128,7 +128,7 @@ class LEG:
             return 0
 
     def shiftIn(self, client):
-        Utils.logger.info("shifting in initialized for "+ self.type)
+        Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"shifting in initialized for "+ self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(client)
         liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
                              liveUtils.getQuote(self.symbol, client), self.strategyNo)
@@ -145,11 +145,11 @@ class LEG:
         else:
             hedgestrike = str(int(self.Strike) + hedgeDist * self.shift)
         symbol = index + self.exp_date + hedgestrike + self.type
-        Utils.logger.info("hedge", end=" ")
+        Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"hedge", end=" ")
         self.hedge.setLegPars(symbol, client)
 
     def updatePremium(self, client):
-        Utils.logger.info("updating premium for " + self.symbol)
+        Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"updating premium for " + self.symbol)
         self.realizedProfit += self.getLegUnRealizedProfit(client)
         self.premium = liveUtils.getQuote(self.symbol, client)
         if self.hedge:
@@ -158,7 +158,7 @@ class LEG:
     def exit(self, client):
         if not self.premium:
             return
-        Utils.logger.info("exiting leg")
+        Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"exiting leg")
         liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
                              liveUtils.getQuote(self.symbol, client), self.strategyNo)
         if self.hedge:
