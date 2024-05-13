@@ -30,6 +30,7 @@ def getQuote(symbol, client):
 
 def placeOrder(client, instrument_symbol, transaction_type, premium, stratrgyNo):
     Utils.logger.info("placing {} order for {} at {}".format(transaction_type, instrument_symbol, premium))
+    return
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     orderID = client.IB_MappedOrderAdv(SignalID=0,
                                        StrategyTag=Utils.strategyTag[stratrgyNo],
@@ -46,23 +47,23 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, stratrgyNo)
                                        SignalLTP=0,
                                        OptionsType="")
     Utils.logger.debug("order placed with orderID " + str(orderID))
-    # while True:
-    #     try:
-    #         statuses = client.IB_OrderStatus(orderID)
-    #         done = True
-    #         for status in statuses.split(","):
-    #             if status != "completed":
-    #                 done = False
-    #                 Utils.logger.warn("order not completed with status" + statuses)
-    #                 time.sleep(0.05)
-    #                 break
-    #         if done:
-    #             Utils.logger.info("order completed for all users")
-    #             break
-    #     except Exception as e:
-    #         Utils.logger.error(e)
-    #         time.sleep(1)
-    #         continue
+    while True:
+        try:
+            statuses = client.IB_OrderStatus(orderID)
+            done = True
+            for status in statuses.split(","):
+                if status != "completed":
+                    done = False
+                    Utils.logger.warn("order not completed with status" + statuses)
+                    time.sleep(0.05)
+                    break
+            if done:
+                Utils.logger.info("order completed for all users")
+                break
+        except Exception as e:
+            Utils.logger.error(e)
+            time.sleep(1)
+            continue
     # for user in users:
     #     user.order(instrument_token, instrument_symbol, transaction_type, premium, quantity)
 
