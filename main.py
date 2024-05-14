@@ -1,7 +1,6 @@
 import multiprocessing
 import time
 
-import liveUtils
 from PriceStream import PriceStream
 
 import Utils
@@ -25,10 +24,10 @@ def runStrategy(strategyNo, client, priceDict):
 
 if __name__ == '__main__':
     Utils.logger.info("Starting the program")
-    client = None  #IB_APIS("http://localhost:21000")
+    client = IB_APIS("http://localhost:21000")
     priceStream = PriceStream()
     priceStream.connect()
-    time.sleep(10)
+    time.sleep(5)
     processes = []
     for i in range(4):
         processes.append(multiprocessing.Process(target=runStrategy, args=(i, client, priceStream.priceDict)))
