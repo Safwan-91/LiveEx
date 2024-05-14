@@ -4,7 +4,6 @@ from Utils import executor
 
 import Utils
 
-
 def getQuote(symbol, client):
     return 20
     tryNo = 0
@@ -29,8 +28,8 @@ def getQuote(symbol, client):
                 return e
 
 
-def placeOrder(client, instrument_symbol, transaction_type, premium, stratrgyNo):
-    Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"placing {} order for {} at {}".format(transaction_type, instrument_symbol, premium))
+def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo):
+    Utils.logger.info("strategy_"+str(strategyNo)+" - "+"placing {} order for {} at {}".format(transaction_type, instrument_symbol, premium))
     return
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     orderID = client.IB_MappedOrderAdv(SignalID=0,
