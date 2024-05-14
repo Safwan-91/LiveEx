@@ -3,7 +3,7 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
 index = "FINNIFTY"
-expDate = "14MAY24"
+expDate = "24514"
 indexExchange = "NSE"
 fnoExchange = "NFO"
 

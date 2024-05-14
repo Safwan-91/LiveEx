@@ -1,3 +1,4 @@
+import calendar
 import threading
 import time
 from Utils import executor
@@ -51,7 +52,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
                                        SLTrailingValue="",
                                        SignalLTP=0,
                                        OptionsType="")
-    Utils.logger.debug("strategy_" + str(self.strategyNo) + " - " + "order placed with orderID " + str(orderID))
+    Utils.logger.debug("strategy_" + str(strategyNo) + " - " + "order placed with orderID " + str(orderID))
     while True:
         try:
             statuses = client.IB_OrderStatus(orderID)
@@ -63,7 +64,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
                     time.sleep(0.05)
                     break
             if done:
-                Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "order completed for all users")
+                Utils.logger.info("strategy_" + str(strategyNo) + " - " + "order completed for all users")
                 break
         except Exception as e:
             Utils.logger.error(e)
@@ -87,3 +88,13 @@ def execute_in_parallel(func_list, *args):
     for future in results:
         future.result()
     return results
+
+
+def getShonyaExp(expDate):
+    map = {"O": 10, "N": 11, "D": 12}
+    if expDate[2].isnumeric():
+        m = int(expDate[2]) if expDate[2] not in map else map[expDate[2]]
+        expDate = expDate[-2:] + calendar.month_abbr[m].upper() + expDate[:2]
+    else:
+        expDate = expDate
+    return expDate
