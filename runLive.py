@@ -1,5 +1,4 @@
 import time
-
 import Utils
 from strategy import Strategy
 import liveUtils
@@ -13,30 +12,29 @@ class Live:
         self.strategy = Strategy("sell", strategyNo)
         self.hedge = False
 
-    def callback_method(self, client, currentime):
+    def callback_method(self, client, currentime, priceDict):
         if not self.hedge and currentime[:5] >= Utils.startTime[self.strategyNo][:5]:
-            self.subscribeAllTokens(client)
-            time.sleep(10)
-            self.buyHedge(client)
+            time.sleep(3)
+            self.buyHedge(priceDict)
             self.hedge = True
             if currentime[:5] == Utils.startTime[self.strategyNo][:5]:
                 return
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"New minute formed, executing computation")
         if not self.strategy.started:
-            self.strategy.start(client, client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""),
-                                self.expDate)
+            self.strategy.start(client, priceDict[Utils.indexToken],
+                                self.expDate, priceDict)
         # elif currentTime >= "15:29:00":
         #     self.strategy.end(client)
         elif self.mtmhit or (self.strategy.started and (
-                self.strategy.straddle.getProfit(client) < -Utils.mtmStopLoss)):
+                self.strategy.straddle.getProfit(priceDict) < -Utils.mtmStopLoss)):
             if not self.mtmhit:
-                self.mtmhit = (self.strategy.straddle.getProfit(client))
-                self.strategy.end(client)
+                self.mtmhit = (self.strategy.straddle.getProfit(priceDict))
+                self.strategy.end(client, priceDict)
                 Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"mtm hit for price " + str(self.mtmhit))
             return
         elif self.strategy.started:
-            self.strategy.piyushAdjustment(client.IB_LTP(Utils.indexExchange, Utils.indexToken, ""), client, currentime)
-        self.subscribeAllTokens(client)
+            self.strategy.piyushAdjustment(priceDict[Utils.indexToken], client, currentime, priceDict)
+        # self.subscribeAllTokens(client)
 
     def subscribeAllTokens(self, client):
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"subscribing tokens")
@@ -53,9 +51,9 @@ class Live:
             client.IB_Subscribe(Utils.fnoExchange, symbolpe, "")
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"all tokens subscribed")
 
-    def buyHedge(self, client):
+    def buyHedge(self, priceDict):
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"buying Hedge")
-        spot = client.IB_LTP(Utils.indexExchange, Utils.indexToken, "")
+        spot = priceDict[Utils.indexToken]
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         symbolce = Utils.index + self.expDate + str(int(atm) + 20 * Utils.strikeDifference) + "CE"
         symbolpe = Utils.index + self.expDate + str(int(atm) - 20 * Utils.strikeDifference) + "PE"
