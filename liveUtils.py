@@ -4,6 +4,7 @@ from Utils import executor
 
 import Utils
 
+
 def getQuote(symbol, stxoSymbol, client, priceDict):
     # return 20
     tryNo = 0
@@ -14,10 +15,10 @@ def getQuote(symbol, stxoSymbol, client, priceDict):
             time.sleep(0.1)
             # Utils.logger.debug("strategy_"+str(self.strategyNo)+" - "+"fetching quote for {} for {}th try".format(symbol, tryNo))
             ltp = client.IB_LTP(Utils.fnoExchange, stxoSymbol, "")
-            Utils.logger.debug("strategy_"+" - "+"quote fetched with ltp " + str(ltp))
+            Utils.logger.debug("strategy_" + " - " + "quote fetched with ltp " + str(ltp))
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
             if ltp == 0:
-                Utils.logger.debug("strategy_"+" - "+"get quote attempt failed "+ str(ltp))
+                Utils.logger.debug("strategy_" + " - " + "get quote attempt failed " + str(ltp))
                 client.IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
                 tryNo += 1
                 time.sleep(0.5)
@@ -32,7 +33,9 @@ def getQuote(symbol, stxoSymbol, client, priceDict):
 
 
 def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo):
-    Utils.logger.info("strategy_"+str(strategyNo)+" - "+"placing {} order for {} at {}".format(transaction_type, instrument_symbol, premium))
+    Utils.logger.info("strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
+                                                                                                     instrument_symbol,
+                                                                                                     premium))
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     orderID = client.IB_MappedOrderAdv(SignalID=0,
                                        StrategyTag=Utils.strategyTag[strategyNo],
@@ -48,7 +51,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
                                        SLTrailingValue="",
                                        SignalLTP=0,
                                        OptionsType="")
-    Utils.logger.debug("strategy_"+str(self.strategyNo)+" - "+"order placed with orderID " + str(orderID))
+    Utils.logger.debug("strategy_" + str(self.strategyNo) + " - " + "order placed with orderID " + str(orderID))
     while True:
         try:
             statuses = client.IB_OrderStatus(orderID)
@@ -60,7 +63,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
                     time.sleep(0.05)
                     break
             if done:
-                Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"order completed for all users")
+                Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "order completed for all users")
                 break
         except Exception as e:
             Utils.logger.error(e)
