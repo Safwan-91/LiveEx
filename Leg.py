@@ -38,7 +38,7 @@ class LEG:
             symbol = self.getShonyaSymbol(str(newStrike))
             premium = 0
             try:
-                premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, client)
+                premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, client, priceDict)
             except Exception as e:
                 Utils.logger.error(e)
             if premium < premiumTarget:
@@ -50,12 +50,12 @@ class LEG:
             newStrike = newStrike + self.shift
 
     def setLegPars(self, symbol, client, priceDict):
-        self.Strike = symbol[-7:-2]
+        self.Strike = symbol[-5:]
         # if self.transactionType == "sell" and not self.symbol:
         #     self.setHedge(20, tokenData, client, users)
         self.symbol = symbol
-        self.premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, client)
-        liveUtils.placeOrder(client, self.symbol, self.transactionType, self.premium, self.strategyNo)
+        self.premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(), client, priceDict)
+        liveUtils.placeOrder(client, self.getSymbol(), self.transactionType, self.premium, self.strategyNo)
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " +
                           self.type + " parameters set with strike {} and premium {}".format(self.Strike,
                                                                                              self.premium), )
@@ -108,7 +108,7 @@ class LEG:
                 # self.hedge.premium = 0
                 return int(initialStrike)
             else:
-                liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
+                liveUtils.placeOrder(client, self.getSymbol(), getOppTransaction(self.transactionType),
                                      priceDict[self.symbol], self.strategyNo)
                 self.setStrike(adjustmentPercent * self.premium, None, client, priceDict)
                 # self.setHedge(priceDict, 20, tokenData)
@@ -125,7 +125,7 @@ class LEG:
             Utils.logger.info(
                 "strategy_" + str(self.strategyNo) + " - " + self.type + " leg rematch occured, initiating rematch ")
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-            liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
+            liveUtils.placeOrder(client, self.getSymbol(), getOppTransaction(self.transactionType),
                                  priceDict[self.symbol], self.strategyNo)
             symbol = self.getShonyaSymbol(str(straddleCentre))
             self.premium = 0
@@ -137,7 +137,7 @@ class LEG:
     def shiftIn(self, client, priceDict):
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "shifting in initialized for " + self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-        liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
+        liveUtils.placeOrder(client, self.getSymbol(), getOppTransaction(self.transactionType),
                              priceDict[self.symbol], self.strategyNo)
         symbol = self.getShonyaSymbol(str(int(self.Strike) - Utils.shiftAmount * self.shift))
         self.setLegPars(symbol, client, priceDict)
@@ -166,7 +166,7 @@ class LEG:
         if not self.premium:
             return
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "exiting leg")
-        liveUtils.placeOrder(client, self.symbol, getOppTransaction(self.transactionType),
+        liveUtils.placeOrder(client, self.getSymbol(), getOppTransaction(self.transactionType),
                              priceDict[self.symbol], self.strategyNo)
         if self.hedge:
             self.hedge.exit(client, priceDict)
@@ -182,3 +182,8 @@ class LEG:
             expDate = self.exp_date
         return Utils.index + expDate + self.type[
             0] + strike if Utils.index != "SENSEX" else Utils.index + expDate + strike + self.type
+
+    def getSymbol(self, strike=None):
+        if not strike:
+            strike = self.Strike
+        return Utils.index + self.exp_date + strike + self.type

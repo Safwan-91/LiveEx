@@ -9,27 +9,41 @@ class PriceStream:
         self.feedStarted = False
         self.expDate = Utils.expDate
         self.priceDict = Manager().dict(({}))
+        self.tickSymbolMap = {}
 
     def connect(self):
         def event_handler_feed_update(tick_data):
-            print("in feed handler")
-            print(tick_data)
+            # print("in feed handler")
+            # print(tick_data)
             try:
+
                 if not self.feedStarted:
-                    self.priceDict[tick_data["ts"]] = float(tick_data["c"])
+                    self.tickSymbolMap[tick_data["tk"]] = Utils.indexToken
+                    self.priceDict["addons"] = []
+                    self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
                     atm = int(round(float(tick_data["c"]) / 50) * 50)
                     l = []
                     for i in range(10):
                         symbolce = Utils.index + Utils.expDate + "C" + str(atm + i * Utils.strikeDifference)
                         symbolpe = Utils.index + Utils.expDate + "P" + str(atm - i * Utils.strikeDifference)
-                        l.append('NFO|' + self.api.searchscrip("NFO", symbolce)["values"][0]["token"])
-                        l.append('NFO|' + self.api.searchscrip("NFO", symbolpe)["values"][0]["token"])
+                        tokence = self.api.searchscrip("NFO", symbolce)["values"][0]["token"]
+                        tokenpe = self.api.searchscrip("NFO", symbolpe)["values"][0]["token"]
+                        l.append('NFO|' + tokence)
+                        l.append('NFO|' + tokenpe)
+                        self.tickSymbolMap[tokence] = symbolce
+                        self.tickSymbolMap[tokenpe] = symbolpe
                     self.feedStarted = True
                     self.api.subscribe(l)
                 else:
-                    self.priceDict[tick_data["ts"]] = float(tick_data["c"])
+                    self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(
+                        tick_data["lp"]) if "lp" in tick_data else float(tick_data["bp1"])
+                while len(self.priceDict["addons"]) != 0:
+                    token = self.api.searchscrip("NFO", self.priceDict["addons"].pop())["values"][0]["token"]
+                    self.api.subscribe('NFO|' + token)
             except Exception as e:
-                print(e)
+                pass
+                # print("in exception")
+                # print(e)
 
         def open_callback():
             print("in open callback")

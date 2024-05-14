@@ -38,7 +38,7 @@ class Strategy:
                               "mtm is {} ce premium is {}, pe premium is {}".format(
                                   round(self.straddle.getProfit(priceDict), 2),
                                   priceDict[self.straddle.ce.symbol],
-                                  priceDict[self.straddle.ce.symbol]))
+                                  priceDict[self.straddle.pe.symbol]))
             Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "ce adjustment level - " + str(
                 self.straddle.ce.currentAdjustmentLevel) + " pe adjustment level - " + str(
                 self.straddle.pe.currentAdjustmentLevel))

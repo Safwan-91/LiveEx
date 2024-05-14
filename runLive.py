@@ -20,6 +20,7 @@ class Live:
             if currentime[:5] == Utils.startTime[self.strategyNo][:5]:
                 return
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"New minute formed, executing computation")
+        Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "the current min closes are" + str(priceDict))
         if not self.strategy.started:
             self.strategy.start(client, priceDict[Utils.indexToken],
                                 self.expDate, priceDict)

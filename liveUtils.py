@@ -4,21 +4,24 @@ from Utils import executor
 
 import Utils
 
-def getQuote(symbol, client):
-    return 20
+def getQuote(symbol, stxoSymbol, client, priceDict):
+    # return 20
     tryNo = 0
     while tryNo <= 5:
         try:
-            Utils.logger.debug("strategy_"+str(self.strategyNo)+" - "+"fetching quote for {} for {}th try".format(symbol, tryNo))
-            ltp = client.IB_LTP(Utils.fnoExchange, symbol, "")
-            Utils.logger.debug("strategy_"+str(self.strategyNo)+" - "+"quote fetched with ltp " + str(ltp))
+            client.IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
+            priceDict["addons"].append(symbol)
+            time.sleep(0.1)
+            # Utils.logger.debug("strategy_"+str(self.strategyNo)+" - "+"fetching quote for {} for {}th try".format(symbol, tryNo))
+            ltp = client.IB_LTP(Utils.fnoExchange, stxoSymbol, "")
+            Utils.logger.debug("strategy_"+" - "+"quote fetched with ltp " + str(ltp))
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
-            # if ltp == 0:
-            #     Utils.logger.debug("strategy_"+str(self.strategyNo)+" - "+"get quote attempt failed "+ str(ltp))
-            #     client.IB_Subscribe(Utils.fnoExchange, symbol, "")
-            #     tryNo += 1
-            #     time.sleep(0.5)
-            #     continue
+            if ltp == 0:
+                Utils.logger.debug("strategy_"+" - "+"get quote attempt failed "+ str(ltp))
+                client.IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
+                tryNo += 1
+                time.sleep(0.5)
+                continue
             return float(ltp)
         except Exception as e:
             Utils.logger.error("Exception when calling get Quote api->quotes: %s\n" % e)
@@ -30,10 +33,9 @@ def getQuote(symbol, client):
 
 def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo):
     Utils.logger.info("strategy_"+str(strategyNo)+" - "+"placing {} order for {} at {}".format(transaction_type, instrument_symbol, premium))
-    return
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     orderID = client.IB_MappedOrderAdv(SignalID=0,
-                                       StrategyTag=Utils.strategyTag[stratrgyNo],
+                                       StrategyTag=Utils.strategyTag[strategyNo],
                                        SourceSymbol=instrument_symbol,
                                        TransactionType=transaction_type,
                                        OrderType="MARKET",
