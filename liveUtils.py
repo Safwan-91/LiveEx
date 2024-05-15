@@ -60,7 +60,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
             for status in statuses.split(","):
                 if status != "completed":
                     done = False
-                    Utils.logger.warn("order not completed with status" + statuses)
+                    Utils.logger.warn("strategy_" + str(strategyNo) + " - " + "order not completed with status" + statuses)
                     time.sleep(0.05)
                     break
             if done:
@@ -81,13 +81,13 @@ def execute_in_parallel(func_list, *args):
 
     results = []
     for func in func_list:
-        # Pass parameters to sub_task
-        results.append(executor.submit(execute_func, func))
+        thread = threading.Thread(target=execute_func, args=(func,))
+        results.append(thread)
+        thread.start()
 
-    # Wait for all sub-tasks to complete
-    for future in results:
-        future.result()
-    return results
+    # Wait for all threads to finish
+    for thread in results:
+        thread.join()
 
 
 def getShonyaExp(expDate):

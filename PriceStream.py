@@ -49,6 +49,6 @@ class PriceStream:
 
         def open_callback():
             print("in open callback")
-            self.api.subscribe('NSE|' + self.api.searchscrip(Utils.indexExchange, Utils.index)["values"][0]["token"])
+            self.api.subscribe('NSE|' + self.api.searchscrip(Utils.indexExchange, "Nifty Bank")["values"][0]["token"])
 
         self.api.start_websocket(subscribe_callback=event_handler_feed_update, socket_open_callback=open_callback)
