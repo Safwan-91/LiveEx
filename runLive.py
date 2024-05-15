@@ -15,7 +15,7 @@ class Live:
     def callback_method(self, client, currentime, priceDict):
         if not self.hedge and currentime[:5] >= Utils.startTime[self.strategyNo][:5]:
             time.sleep(3)
-            self.buyHedge(priceDict)
+            self.buyHedge(client, priceDict)
             self.hedge = True
             if currentime[:5] == Utils.startTime[self.strategyNo][:5]:
                 return
@@ -52,12 +52,12 @@ class Live:
             client.IB_Subscribe(Utils.fnoExchange, symbolpe, "")
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"all tokens subscribed")
 
-    def buyHedge(self, priceDict):
+    def buyHedge(self,client, priceDict):
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"buying Hedge")
         spot = priceDict[Utils.indexToken]
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         symbolce = Utils.index + self.expDate + str(int(atm) + 20 * Utils.strikeDifference) + "CE"
         symbolpe = Utils.index + self.expDate + str(int(atm) - 20 * Utils.strikeDifference) + "PE"
-        # liveUtils.placeOrder(client, symbolce, "buy", 0)
-        # liveUtils.placeOrder(client, symbolpe, "buy", 0)
+        liveUtils.placeOrder(client, symbolce, "buy", 0, self.strategyNo)
+        liveUtils.placeOrder(client, symbolpe, "buy", 0, self.strategyNo)
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"hedge bought successfully")
