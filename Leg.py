@@ -38,7 +38,7 @@ class LEG:
             symbol = self.getShonyaSymbol(str(newStrike))
             premium = 0
             try:
-                premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, client, priceDict)
+                premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(str(newStrike)), client, priceDict)
             except Exception as e:
                 Utils.logger.error(e)
             if premium < premiumTarget:
