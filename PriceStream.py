@@ -19,18 +19,18 @@ class PriceStream:
             try:
 
                 if not self.feedStarted:
-                    self.tickSymbolMap[tick_data["tk"]] = Utils.indexToken
+                    self.tickSymbolMap[tick_data["tk"]] = Utils.index
                     self.priceDict["addons"] = []
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
-                    atm = int(round(float(tick_data["lp"]) / 50) * 50)
+                    atm = int(round(float(tick_data["lp"]) / Utils.strikeDifference) * Utils.strikeDifference)
                     l = []
                     for i in range(10):
-                        symbolce = Utils.index + liveUtils.getShonyaExp(Utils.expDate) + "C" + str(atm + i * Utils.strikeDifference)
-                        symbolpe = Utils.index + liveUtils.getShonyaExp(Utils.expDate) + "P" + str(atm - i * Utils.strikeDifference)
-                        tokence = self.api.searchscrip("NFO", symbolce)["values"][0]["token"]
-                        tokenpe = self.api.searchscrip("NFO", symbolpe)["values"][0]["token"]
-                        l.append('NFO|' + tokence)
-                        l.append('NFO|' + tokenpe)
+                        symbolce = liveUtils.getShonyaSymbol(str(atm + i * Utils.strikeDifference), Utils.expDate, "CE")
+                        symbolpe = liveUtils.getShonyaSymbol(str(atm - i * Utils.strikeDifference), Utils.expDate, "PE")
+                        tokence = self.api.searchscrip(Utils.fnoExchange, symbolce)["values"][0]["token"]
+                        tokenpe = self.api.searchscrip(Utils.fnoExchange, symbolpe)["values"][0]["token"]
+                        l.append(Utils.fnoExchange + '|' + tokence)
+                        l.append(Utils.fnoExchange + '|' + tokenpe)
                         self.tickSymbolMap[tokence] = symbolce
                         self.tickSymbolMap[tokenpe] = symbolpe
                     self.feedStarted = True
@@ -40,8 +40,9 @@ class PriceStream:
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(
                         tick_data["lp"]) if "lp" in tick_data else float(tick_data["bp1"])
                 while len(self.priceDict["addons"]) != 0:
-                    token = self.api.searchscrip("NFO", self.priceDict["addons"].pop())["values"][0]["token"]
-                    self.api.subscribe('NFO|' + token)
+                    token = self.api.searchscrip(Utils.fnoExchange, self.priceDict["addons"].pop())["values"][0][
+                        "token"]
+                    self.api.subscribe(Utils.fnoExchange + '|' + token)
             except Exception as e:
                 pass
                 # print("in exception")
@@ -49,6 +50,7 @@ class PriceStream:
 
         def open_callback():
             print("in open callback")
-            self.api.subscribe('NSE|' + self.api.searchscrip(Utils.indexExchange, "Nifty Bank")["values"][0]["token"])
+            self.api.subscribe(
+                Utils.indexExchange + '|' + Utils.indexToken)
 
         self.api.start_websocket(subscribe_callback=event_handler_feed_update, socket_open_callback=open_callback)
