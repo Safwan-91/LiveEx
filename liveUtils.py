@@ -99,4 +99,4 @@ def getShonyaSymbol(strike, exp_date, type):
     else:
         expDate = exp_date
     return Utils.index + expDate + type[
-        0] + strike if Utils.index in ["SENSEX","BANKEX"] else Utils.index + exp_date + strike + type
+        0] + strike if Utils.index not in ["SENSEX","BANKEX"] else Utils.index + exp_date + strike + type
