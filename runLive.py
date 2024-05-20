@@ -22,7 +22,7 @@ class Live:
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"New minute formed, executing computation")
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "the current min closes are" + str(priceDict))
         if not self.strategy.started:
-            self.strategy.start(client, priceDict[Utils.indexToken],
+            self.strategy.start(client, priceDict[Utils.index],
                                 self.expDate, priceDict)
         # elif currentTime >= "15:29:00":
         #     self.strategy.end(client)
@@ -34,7 +34,7 @@ class Live:
                 Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"mtm hit for price " + str(self.mtmhit))
             return
         elif self.strategy.started:
-            self.strategy.piyushAdjustment(priceDict[Utils.indexToken], client, currentime, priceDict)
+            self.strategy.piyushAdjustment(priceDict[Utils.index], client, currentime, priceDict)
         # self.subscribeAllTokens(client)
 
     def subscribeAllTokens(self, client):
@@ -54,7 +54,7 @@ class Live:
 
     def buyHedge(self,client, priceDict):
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"buying Hedge")
-        spot = priceDict[Utils.indexToken]
+        spot = priceDict[Utils.index]
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         symbolce = Utils.index + self.expDate + str(int(atm) + 20 * Utils.strikeDifference) + "CE"
         symbolpe = Utils.index + self.expDate + str(int(atm) - 20 * Utils.strikeDifference) + "PE"
