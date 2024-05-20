@@ -50,7 +50,7 @@ class LEG:
             newStrike = newStrike + self.shift
 
     def setLegPars(self, symbol, client, priceDict):
-        self.Strike = symbol[-5:]
+        self.Strike = symbol[-5:] if Utils.index not in ["SENSEX", "BANKEX"] else symbol[-7:-2]
         # if self.transactionType == "sell" and not self.symbol:
         #     self.setHedge(20, tokenData, client, users)
         self.symbol = symbol
