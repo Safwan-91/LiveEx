@@ -13,7 +13,7 @@ def runStrategy(strategyNo, client, priceDict):
     runLive = Live(strategyNo)
     currentTime = datetime.now().strftime("%H:%M:%S")
     lastMin = None
-    while "00:15:00" <= currentTime <= "24:30:00":
+    while "00:15:00" <= currentTime <= "15:30:00":
         if currentTime[3:5] != lastMin and currentTime >= Utils.startTime[strategyNo]:
             runLive.callback_method(client, currentTime, priceDict)
             lastMin = currentTime[3:5]
