@@ -38,7 +38,10 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
                                                                                                      instrument_symbol,
                                                                                                      premium))
     transaction_type = "LE" if transaction_type == "buy" else "SE"
-    orderID = client.IB_MappedOrderAdv(SignalID=0,
+    tryNo = 0
+    orderID = None
+    while tryNo < 5:
+        orderID = client.IB_MappedOrderAdv(SignalID=0,
                                        StrategyTag=Utils.strategyTag[strategyNo],
                                        SourceSymbol=instrument_symbol,
                                        TransactionType=transaction_type,
@@ -52,7 +55,12 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
                                        SLTrailingValue="",
                                        SignalLTP=0,
                                        OptionsType="")
-    Utils.logger.debug("strategy_" + str(strategyNo) + " - " + "order placed with orderID " + str(orderID))
+        Utils.logger.debug("strategy_" + str(strategyNo) + " - " + "order placed with orderID {} and tryNo {}".format(orderID, tryNo))
+        if orderID:
+            break
+        else:
+            tryNo+=1
+
     while True:
         try:
             statuses = client.IB_OrderStatus(orderID)
