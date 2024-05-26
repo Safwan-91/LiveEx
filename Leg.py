@@ -69,13 +69,13 @@ class LEG:
     def getLegUnRealizedProfit(self, priceDict):
         try:
             if self.premium and self.transactionType == "sell":
-                return self.premium - priceDict[self.symbol]
+                return self.premium - priceDict[self.getShonyaSymbol()]
             elif self.premium and self.transactionType == "buy":
-                return priceDict[self.symbol] - self.premium
+                return priceDict[self.getShonyaSymbol()] - self.premium
             else:
                 return 0
         except Exception as e:
-            Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "exception occurred", e)
+            Utils.logger.error("strategy_" + str(self.strategyNo) + " - " + "exception occurred {}".format(e))
             return self.premium
 
     def flush(self):
@@ -181,7 +181,7 @@ class LEG:
         else:
             expDate = self.exp_date
         return Utils.index + expDate + self.type[
-            0] + strike if Utils.index != "SENSEX" else Utils.index + expDate + strike + self.type
+            0] + strike if Utils.index not in ["SENSEX","BANKEX"] else Utils.index + self.exp_date + strike + self.type
 
     def getSymbol(self, strike=None):
         if not strike:
