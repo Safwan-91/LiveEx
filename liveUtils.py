@@ -1,6 +1,8 @@
 import calendar
 import threading
 import time
+from datetime import date
+
 from Utils import executor
 
 import Utils
@@ -107,6 +109,6 @@ def getShonyaSymbol(strike, exp_date, type):
         m = int(exp_date[2]) if exp_date[2] not in map else map[exp_date[2]]
         expDate = exp_date[-2:] + calendar.month_abbr[m].upper() + exp_date[:2]
     else:
-        expDate = "28MAY24"
+        expDate = str(date.today().day) + Utils.expDate[-3:] + Utils.expDate[:2]
     return Utils.index + expDate + type[
         0] + strike if Utils.index not in ["SENSEX","BANKEX"] else Utils.index + exp_date + strike + type
