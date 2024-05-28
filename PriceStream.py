@@ -9,7 +9,8 @@ class PriceStream:
         self.api = Shonya(client_id='1').login()
         self.feedStarted = False
         self.expDate = Utils.expDate
-        self.priceDict = Manager().dict(({}))
+        self.manager = Manager()
+        self.priceDict = self.manager.dict()
         self.tickSymbolMap = {}
 
     def connect(self):
@@ -20,7 +21,7 @@ class PriceStream:
 
                 if not self.feedStarted:
                     self.tickSymbolMap[tick_data["tk"]] = Utils.index
-                    self.priceDict["addons"] = []
+                    self.priceDict["addons"] = self.manager.list()
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
                     atm = int(round(float(tick_data["lp"]) / Utils.strikeDifference) * Utils.strikeDifference)
                     l = []
@@ -39,10 +40,16 @@ class PriceStream:
                 else:
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(
                         tick_data["lp"]) if "lp" in tick_data else float(tick_data["bp1"])
+                l=[]
                 while len(self.priceDict["addons"]) != 0:
-                    token = self.api.searchscrip(Utils.fnoExchange, self.priceDict["addons"].pop())["values"][0][
+                    print("inside subscribing addons for ", self.priceDict["addons"][-1])
+                    symbol = self.priceDict["addons"].pop()
+                    token = self.api.searchscrip(Utils.fnoExchange, symbol)["values"][0][
                         "token"]
-                    self.api.subscribe(Utils.fnoExchange + '|' + token)
+                    self.tickSymbolMap[token] = symbol
+                    l.append(Utils.fnoExchange + '|' + token)
+                self.api.subscribe(l)
+
             except Exception as e:
                 pass
                 # print("in exception")
