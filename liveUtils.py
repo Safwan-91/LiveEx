@@ -12,7 +12,8 @@ def getQuote(symbol, stxoSymbol, client, priceDict):
     while tryNo <= 5:
         try:
             client.IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
-            priceDict["addons"].append(symbol)
+            if symbol not in priceDict["addons"]:
+                priceDict["addons"].append(symbol)
             time.sleep(0.1)
             # Utils.logger.debug("strategy_"+str(self.strategyNo)+" - "+"fetching quote for {} for {}th try".format(symbol, tryNo))
             ltp = client.IB_LTP(Utils.fnoExchange, stxoSymbol, "")
@@ -37,6 +38,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
     Utils.logger.info("strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
                                                                                                      instrument_symbol,
                                                                                                      premium))
+    return
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     tryNo = 0
     orderID = None
@@ -101,10 +103,10 @@ def execute_in_parallel(func_list, *args):
 def getShonyaSymbol(strike, exp_date, type):
 
     map = {"O": 10, "N": 11, "D": 12}
-    if exp_date[2].isnumeric():
+    if exp_date[-1].isnumeric():
         m = int(exp_date[2]) if exp_date[2] not in map else map[exp_date[2]]
         expDate = exp_date[-2:] + calendar.month_abbr[m].upper() + exp_date[:2]
     else:
-        expDate = exp_date
+        expDate = "28MAY24"
     return Utils.index + expDate + type[
         0] + strike if Utils.index not in ["SENSEX","BANKEX"] else Utils.index + exp_date + strike + type
