@@ -1,5 +1,6 @@
 import calendar
 import threading
+from datetime import date
 
 import Utils
 import liveUtils
@@ -179,7 +180,7 @@ class LEG:
             m = int(self.exp_date[2]) if self.exp_date[2] not in map else map[self.exp_date[2]]
             expDate = self.exp_date[-2:] + calendar.month_abbr[m].upper() + self.exp_date[:2]
         else:
-            expDate = "28MAY24"
+            expDate = str(date.today().day) + self.exp_date[-3:] + self.exp_date[:2]
         return Utils.index + expDate + self.type[
             0] + strike if Utils.index not in ["SENSEX","BANKEX"] else Utils.index + self.exp_date + strike + self.type
 

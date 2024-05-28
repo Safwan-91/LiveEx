@@ -27,7 +27,7 @@ if __name__ == '__main__':
     client = IB_APIS("http://localhost:21000")
     priceStream = PriceStream()
     priceStream.connect()
-    time.sleep(10)
+    time.sleep(5)
     processes = []
     for i in range(4):
         processes.append(multiprocessing.Process(target=runStrategy, args=(i, client, priceStream.priceDict)))

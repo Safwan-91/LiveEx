@@ -16,7 +16,7 @@ class PriceStream:
     def connect(self):
         def event_handler_feed_update(tick_data):
             # print("in feed handler")
-            # print(tick_data)
+            print(tick_data)
             try:
 
                 if not self.feedStarted:
