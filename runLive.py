@@ -1,4 +1,7 @@
 import time
+
+import asyncio
+
 import Utils
 from strategy import Strategy
 import liveUtils
@@ -14,7 +17,6 @@ class Live:
 
     def callback_method(self, client, currentime, priceDict):
         if not self.hedge and currentime[:5] >= Utils.startTime[self.strategyNo][:5]:
-            time.sleep(3)
             self.buyHedge(client, priceDict)
             self.hedge = True
             if currentime[:5] == Utils.startTime[self.strategyNo][:5]:

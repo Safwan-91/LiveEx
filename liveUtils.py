@@ -40,7 +40,6 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
     Utils.logger.info("strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
                                                                                                      instrument_symbol,
                                                                                                      premium))
-    return
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     tryNo = 0
     orderID = None
@@ -70,7 +69,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
             statuses = client.IB_OrderStatus(orderID)
             done = True
             for status in statuses.split(","):
-                if status != "completed":
+                if status not in ["completed", "rejected"]:
                     done = False
                     Utils.logger.warn("strategy_" + str(strategyNo) + " - " + "order not completed with status" + statuses)
                     time.sleep(0.05)
@@ -86,14 +85,14 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
     #     user.order(instrument_token, instrument_symbol, transaction_type, premium, quantity)
 
 
-def execute_in_parallel(func_list, *args):
+def execute_in_parallel(funcs_and_args):
     # Define a function to be executed in each thread
-    def execute_func(func):
+    def execute_func(func, args):
         return func(*args)
 
     results = []
-    for func in func_list:
-        thread = threading.Thread(target=execute_func, args=(func,))
+    for func, args in funcs_and_args:
+        thread = threading.Thread(target=execute_func, args=(func, args))
         results.append(thread)
         thread.start()
 
