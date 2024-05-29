@@ -51,7 +51,7 @@ class PriceStream:
                     self.api.subscribe(Utils.fnoExchange + '|' + token)
 
             except Exception as e:
-                Utils.logger.debug("Exception in price feed - {}".format(e))
+                Utils.logger.error("Exception in price feed - {}".format(e))
 
         def open_callback():
             Utils.logger.debug("in open callback")
