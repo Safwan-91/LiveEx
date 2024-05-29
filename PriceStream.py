@@ -1,7 +1,9 @@
 import Utils
 import liveUtils
 from shonya import Shonya
-from multiprocessing import Manager
+
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 
 class PriceStream:
@@ -9,8 +11,7 @@ class PriceStream:
         self.api = Shonya(client_id='1').login()
         self.feedStarted = False
         self.expDate = Utils.expDate
-        self.manager = Manager()
-        self.priceDict = self.manager.dict()
+        self.priceDict = {}
         self.tickSymbolMap = {}
 
     def connect(self):
@@ -21,7 +22,7 @@ class PriceStream:
 
                 if not self.feedStarted:
                     self.tickSymbolMap[tick_data["tk"]] = Utils.index
-                    self.priceDict["addons"] = self.manager.list()
+                    self.priceDict["addons"] = []
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
                     atm = int(round(float(tick_data["lp"]) / Utils.strikeDifference) * Utils.strikeDifference)
                     l = []

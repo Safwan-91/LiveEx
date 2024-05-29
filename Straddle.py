@@ -19,7 +19,7 @@ class STRADDLE:
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         self.ce.exp_date = expDate
         self.pe.exp_date = expDate
-        liveUtils.execute_in_parallel([self.ce.setStrike, self.pe.setStrike], initialPremium, atm, client, priceDict)
+        liveUtils.execute_in_parallel([(self.ce.setStrike, (initialPremium, atm, client, priceDict)), (self.pe.setStrike, (initialPremium, atm, client, priceDict))])
         self.strikeStack = []
         self.mean.append(spot)
 
