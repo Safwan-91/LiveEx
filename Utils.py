@@ -30,7 +30,7 @@ lotSizeMap = {"MIDCPNIFTY": 1, "FINNIFTY": 3, "BANKNIFTY": 3, "NIFTY": 4, "SENSE
 shiftAmountMap = {"MIDCPNIFTY": 1, "FINNIFTY": 1, "BANKNIFTY": 2, "NIFTY": 1, "SENSEX": 2, "BANKEX": 2}
 
 adjustmentShift = "True"
-shiftAmount = shiftAmountMap[index] if adjSL == 1 else shiftAmountMap[index] + 1
+shiftAmount = [shiftAmountMap[index] if sl == 1 else shiftAmountMap[index] + 1 for sl in adjSL]
 indexToken = indexTokenMap[index]
 lotSize = lotSizeMap[index]
 SLMap = {0: [0.3, 0.3, 0.3, 0.3], 1: adjSL, 2: 0}
