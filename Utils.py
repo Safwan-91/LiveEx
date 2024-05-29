@@ -6,6 +6,7 @@ index = "BANKNIFTY"
 expDate = "24MAY"
 indexExchange = "NSE"
 fnoExchange = "NFO"
+hedgeDist = 20
 
 startTime = ["09:44:00", "09:44:00", "10:44:00", "10:44:00"]
 adjSL = [1,2,1,2]
