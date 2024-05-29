@@ -140,7 +140,7 @@ class LEG:
         self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
         liveUtils.placeOrder(client, self.getSymbol(), getOppTransaction(self.transactionType),
                              priceDict[self.symbol], self.strategyNo)
-        symbol = self.getShonyaSymbol(str(int(self.Strike) - Utils.shiftAmount * self.shift))
+        symbol = self.getShonyaSymbol(str(int(self.Strike) - Utils.shiftAmount[self.strategyNo] * self.shift))
         self.setLegPars(symbol, client, priceDict)
 
     def setHedge(self, hedgeDist, client):
