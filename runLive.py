@@ -56,8 +56,8 @@ class Live:
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"buying Hedge")
         spot = priceDict[Utils.index]
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
-        symbolce = Utils.index + self.expDate + str(int(atm) + 20 * Utils.strikeDifference) + "CE"
-        symbolpe = Utils.index + self.expDate + str(int(atm) - 20 * Utils.strikeDifference) + "PE"
+        symbolce = Utils.index + self.expDate + str(int(atm) + Utils.hedgeDist * Utils.strikeDifference) + "CE"
+        symbolpe = Utils.index + self.expDate + str(int(atm) - Utils.hedgeDist * Utils.strikeDifference) + "PE"
         liveUtils.placeOrder(client, symbolce, "buy", 0, self.strategyNo)
         liveUtils.placeOrder(client, symbolpe, "buy", 0, self.strategyNo)
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"hedge bought successfully")
