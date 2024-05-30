@@ -17,7 +17,7 @@ class LEG:
         self.type = type
         self.transactionType = transactionType
         self.Strike = None
-        self.exp_date = None
+        self.exp_date = Utils.expDate
         self.symbol = None
         self.premium = None
         self.currentAdjustmentLevel = 0
@@ -96,7 +96,7 @@ class LEG:
         :param tokenData:
         :return:
         """
-        if self.getLegUnRealizedProfit(priceDict) < - SLMap[self.currentAdjustmentLevel][self.strategyNo] * self.premium:
+        if self.getLegUnRealizedProfit(priceDict) <= - SLMap[self.currentAdjustmentLevel][self.strategyNo] * self.premium:
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
             initialStrike = self.Strike
             Utils.logger.info("strategy_" + str(

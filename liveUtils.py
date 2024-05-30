@@ -40,6 +40,7 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
     Utils.logger.info("strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
                                                                                                      instrument_symbol,
                                                                                                      premium))
+    return
     transaction_type = "LE" if transaction_type == "buy" else "SE"
     tryNo = 0
     orderID = None
@@ -63,15 +64,15 @@ def placeOrder(client, instrument_symbol, transaction_type, premium, strategyNo)
             break
         else:
             tryNo+=1
-
-    while True:
+    tryNo = 0
+    while tryNo <= 5:
         try:
             statuses = client.IB_OrderStatus(orderID)
             done = True
             for status in statuses.split(","):
                 if status not in ["completed", "rejected"]:
                     done = False
-                    Utils.logger.warn("strategy_" + str(strategyNo) + " - " + "order not completed with status" + statuses)
+                    # Utils.logger.warn("strategy_" + str(strategyNo) + " - " + "order not completed with status" + statuses)
                     time.sleep(0.05)
                     break
             if done:
