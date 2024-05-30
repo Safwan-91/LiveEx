@@ -17,7 +17,7 @@ class PriceStream:
     def connect(self):
         def event_handler_feed_update(tick_data):
             # print("in feed handler")
-            # print(tick_data)
+            print(tick_data)
             try:
 
                 if not self.feedStarted:
@@ -26,7 +26,7 @@ class PriceStream:
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
                     atm = int(round(float(tick_data["lp"]) / Utils.strikeDifference) * Utils.strikeDifference)
                     l = []
-                    for i in range(-5,10):
+                    for i in range(0):
                         symbolce = liveUtils.getShonyaSymbol(str(atm + i * Utils.strikeDifference), Utils.expDate, "CE")
                         symbolpe = liveUtils.getShonyaSymbol(str(atm - i * Utils.strikeDifference), Utils.expDate, "PE")
                         tokence = self.api.searchscrip(Utils.fnoExchange, symbolce)["values"][0]["token"]

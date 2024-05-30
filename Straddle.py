@@ -14,11 +14,9 @@ class STRADDLE:
     def getProfit(self, priceDict):
         return self.ce.getLegProfit(priceDict) + self.pe.getLegProfit(priceDict)
 
-    def setupStraddle(self, spot, client, expDate, priceDict):
+    def setupStraddle(self, spot, client, priceDict):
         Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"setting up initial position at " + str(spot))
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
-        self.ce.exp_date = expDate
-        self.pe.exp_date = expDate
         liveUtils.execute_in_parallel([(self.ce.setStrike, (initialPremium, atm, client, priceDict)), (self.pe.setStrike, (initialPremium, atm, client, priceDict))])
         self.strikeStack = []
         self.mean.append(spot)
