@@ -16,29 +16,29 @@ class Strategy:
         self.currentAdjustmentLevel = 0
         self.started = False
 
-    def start(self, client, spot, priceDict, currentime):
+    def start(self, spot, priceDict, currentime):
         if self.started or currentime < Utils.startTime[self.strategyNo]:
             return
 
         if not self.hedge and currentime >= Utils.startTime[self.strategyNo]:
-            self.buyHedge(client, priceDict)
+            self.buyHedge(priceDict)
             time.sleep(2)
             self.hedge = True
             if currentime[:5] == Utils.startTime[self.strategyNo][:5]:
                 return
 
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "trade started")
-        self.straddle.setupStraddle(spot, client, priceDict)
+        self.straddle.setupStraddle(spot, priceDict)
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "straddle mean is " + str(self.straddle.mean))
         self.started = True
         time.sleep(2)
 
-    def end(self, client, priceDict):
+    def end(self, priceDict):
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "trade ended")
         # self.started = False
-        return self.straddle.exit(client, priceDict)
+        return self.straddle.exit(priceDict)
 
-    def piyushAdjustment(self, spot, client, currentTime, priceDict):
+    def piyushAdjustment(self, spot, currentTime, priceDict):
         if self.mtmhit:
             return
         Utils.logger.info(
@@ -55,28 +55,28 @@ class Strategy:
         if Utils.oneSideFullHitFlag and (
                 self.straddle.pe.currentAdjustmentLevel == Utils.noOfAdjustment + 1 or self.straddle.ce.currentAdjustmentLevel == Utils.noOfAdjustment + 1):
             return
-        self.straddle.reEnter(spot, client, priceDict)
-        self.straddle.adjust(spot, client, priceDict)
+        self.straddle.reEnter(spot, priceDict)
+        self.straddle.adjust(spot, priceDict)
         Utils.logger.info("strategy_" + str(
             self.strategyNo) + " - " + "piyush adjustment check and adjustments if any done successfully")
 
-    def checkmtmhit(self, client, priceDict):
+    def checkmtmhit(self, priceDict, jff):
         if self.mtmhit or (self.started and (
                 self.straddle.getProfit(priceDict) < -Utils.mtmStopLoss)):
             if not self.mtmhit:
                 self.mtmhit = (self.straddle.getProfit(priceDict))
-                self.end(client, priceDict)
+                self.end(priceDict)
                 Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "mtm hit for price " + str(self.mtmhit))
 
     def getMTM(self, priceDict):
         return round(self.straddle.getProfit(priceDict), 2)
 
-    def buyHedge(self, client, priceDict):
+    def buyHedge(self, priceDict):
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "buying Hedge")
         spot = priceDict[Utils.index]
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         symbolce = Utils.index + Utils.expDate + str(int(atm) + Utils.hedgeDist * Utils.strikeDifference) + "CE"
         symbolpe = Utils.index + Utils.expDate + str(int(atm) - Utils.hedgeDist * Utils.strikeDifference) + "PE"
-        liveUtils.placeOrder(client, symbolce, "buy", 0, self.strategyNo)
-        liveUtils.placeOrder(client, symbolpe, "buy", 0, self.strategyNo)
+        liveUtils.placeOrder(symbolce, "buy", 0, self.strategyNo)
+        liveUtils.placeOrder(symbolpe, "buy", 0, self.strategyNo)
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "hedge bought successfully")
