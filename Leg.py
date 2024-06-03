@@ -26,7 +26,7 @@ class LEG:
         self.hedge = None
         self.strategyNo = strategyNo
 
-    def setStrike(self, premiumTarget, atm, client, priceDict):
+    def setStrike(self, premiumTarget, atm, priceDict):
         """
         fetches the strike which has premium closest to premium target.
         """
@@ -39,24 +39,24 @@ class LEG:
             symbol = self.getShonyaSymbol(str(newStrike))
             premium = 0
             try:
-                premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(str(newStrike)), client, priceDict)
+                premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(str(newStrike)), priceDict)
             except Exception as e:
                 Utils.logger.error(e)
             if premium < premiumTarget:
                 self.premium = premium
                 Utils.logger.info(
                     "strategy_" + str(self.strategyNo) + " - " + "{} fetched with premium {}".format(symbol, premium))
-                self.setLegPars(symbol, client, priceDict)
+                self.setLegPars(symbol, priceDict)
                 return symbol
             newStrike = newStrike + self.shift
 
-    def setLegPars(self, symbol, client, priceDict):
+    def setLegPars(self, symbol, priceDict):
         self.Strike = symbol[-5:] if Utils.index not in ["SENSEX", "BANKEX"] else symbol[-7:-2]
         # if self.transactionType == "sell" and not self.symbol:
-        #     self.setHedge(20, tokenData, client, users)
+        #     self.setHedge(20, tokenData, users)
         self.symbol = symbol
-        self.premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(), client, priceDict)
-        liveUtils.placeOrder(client, self.getSymbol(), self.transactionType, self.premium, self.strategyNo)
+        self.premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(), priceDict)
+        liveUtils.placeOrder(self.getSymbol(), self.transactionType, self.premium, self.strategyNo)
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " +
                           self.type + " parameters set with strike {} and premium {}".format(self.Strike,
                                                                                              self.premium), )
@@ -88,7 +88,7 @@ class LEG:
         self.realizedProfit = 0
         self.hedge = None
 
-    def reExecute(self, client, priceDict):
+    def reExecute(self, priceDict):
         """
         when the current leg hits SL we do an adjustment in the leg to a farther strike
         :param client:
@@ -102,22 +102,22 @@ class LEG:
             Utils.logger.info("strategy_" + str(
                 self.strategyNo) + " - " + self.type + " leg adjustment occured, initiating order placement")
             if self.currentAdjustmentLevel == Utils.noOfAdjustment:
-                threading.Thread(target=self.exit, args=(client, priceDict)).start()
+                threading.Thread(target=self.exit, args=(priceDict)).start()
                 self.premium = 0
                 self.currentAdjustmentLevel += 1
                 # self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(client)
                 # self.hedge.premium = 0
                 return int(initialStrike)
             else:
-                liveUtils.placeOrder(client, self.getSymbol(), getOppTransaction(self.transactionType),
+                liveUtils.placeOrder(self.getSymbol(), getOppTransaction(self.transactionType),
                                      priceDict[self.symbol], self.strategyNo)
-                self.setStrike(adjustmentPercent * self.premium, None, client, priceDict)
+                self.setStrike(adjustmentPercent * self.premium, None, priceDict)
                 # self.setHedge(priceDict, 20, tokenData)
                 self.currentAdjustmentLevel += 1
                 return int(initialStrike)
         return 0
 
-    def reEnter(self, straddleCentre, client, priceDict):
+    def reEnter(self, straddleCentre, priceDict):
         """
         when the spot price comes back to the intial straddle or strangle price we do a reentry.
         :return:
@@ -126,22 +126,22 @@ class LEG:
             Utils.logger.info(
                 "strategy_" + str(self.strategyNo) + " - " + self.type + " leg rematch occured, initiating rematch ")
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-            liveUtils.placeOrder(client, self.getSymbol(), getOppTransaction(self.transactionType),
+            liveUtils.placeOrder(self.getSymbol(), getOppTransaction(self.transactionType),
                                  priceDict[self.symbol], self.strategyNo)
             symbol = self.getShonyaSymbol(str(straddleCentre))
             self.premium = 0
-            self.setLegPars(symbol, client, priceDict)
+            self.setLegPars(symbol, priceDict)
             # self.setHedge(priceDict, 20, tokenData)
             self.currentAdjustmentLevel -= 1
             return 0
 
-    def shiftIn(self, client, priceDict):
+    def shiftIn(self, priceDict):
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "shifting in initialized for " + self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-        liveUtils.placeOrder(client, self.getSymbol(), getOppTransaction(self.transactionType),
+        liveUtils.placeOrder(self.getSymbol(), getOppTransaction(self.transactionType),
                              priceDict[self.symbol], self.strategyNo)
         symbol = self.getShonyaSymbol(str(int(self.Strike) - Utils.shiftAmount[self.strategyNo] * self.shift))
-        self.setLegPars(symbol, client, priceDict)
+        self.setLegPars(symbol, priceDict)
 
     def setHedge(self, hedgeDist, client):
         transactionType = "buy" if self.transactionType == "sell" else "sell"
@@ -163,14 +163,14 @@ class LEG:
         if self.hedge:
             self.hedge.updatePremium(priceDict)
 
-    def exit(self, client, priceDict):
+    def exit(self, priceDict):
         if not self.premium:
             return
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "exiting leg")
-        liveUtils.placeOrder(client, self.getSymbol(), getOppTransaction(self.transactionType),
+        liveUtils.placeOrder(self.getSymbol(), getOppTransaction(self.transactionType),
                              priceDict[self.symbol], self.strategyNo)
         if self.hedge:
-            self.hedge.exit(client, priceDict)
+            self.hedge.exit(priceDict)
 
     def getShonyaSymbol(self, strike=None):
         if not strike:

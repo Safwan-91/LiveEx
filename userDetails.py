@@ -1,4 +1,4 @@
-activeUsers = ["shoonya"]
+activeUsers = ["fathima"]
 users = {
     # "shoonya": {
     #     "broker": "shoonya",
@@ -25,5 +25,8 @@ users = {
         "mobilenumber": "9037265906",
         "password": "LasFath@12",
         "mpin": "123456"
+    },
+    "stxo": {
+        "broker": "stxo"
     }
 }
