@@ -2,8 +2,8 @@ import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
-index = "SENSEX"
-expDate = "24MAY"
+index = "BANKEX"
+expDate = "24603"
 indexExchange = "BSE"
 fnoExchange = "BFO"
 hedgeDist = 30

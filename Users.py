@@ -22,20 +22,18 @@ class User:
             api.login(userid=self.userDetails["userid"], password=self.userDetails["password"], twoFA=input("enter shoonya otp "), vendor_code=self.userDetails["vendorCode"], api_secret=self.userDetails["secret"], imei=self.userDetails["imei"])
             return api
         elif self.userDetails["broker"] == "kotakNeo":
-            client = NeoAPI(consumer_key="q4RDblWAAJJ6udMrdIa9lS4IxGAa", consumer_secret="vQzreB9Z5NzLbMYA1t5I0kvnBYIa",
+            client = NeoAPI(consumer_key=self.userDetails["consumer_key"], consumer_secret=self.userDetails["consumer_secret"],
                             environment='Prod', on_message=None, on_error=None, on_close=None, on_open=None)
-            client.login(mobilenumber="+919447497574", password="Wafa@2020")
-            client.configuration.edit_sid = "sid"
-            client.configuration.edit_token = "token"
-            # client.session_2fa(input())
+            client.login(mobilenumber=self.userDetails["mobilenumber"], password=self.userDetails["password"])
+            client.session_2fa(self.userDetails["mpin"])
             return client
 
     def order(self, instrument_token, instrument_symbol, transaction_type, premium, quantity):
         print("time before order ", datetime.now())
         try:
             if self.userDetails["broker"] == "kotakNeo":
-                order_id = self.client.place_order(exchange_segment="bse_fo", product="NRML", price="", order_type="MKT", quantity=quantity, validity="DAY", trading_symbol="",
-                           transaction_type="", amo="", disclosed_quantity="", market_protection="", pf="", trigger_price="",
+                order_id = self.client.place_order(exchange_segment="bse_fo", product="NRML", price="", order_type="MKT", quantity=quantity, validity="DAY", trading_symbol=instrument_symbol,
+                           transaction_type=transaction_type, amo="", disclosed_quantity="", market_protection="", pf="", trigger_price="",
                            tag="")
                 print(transaction_type + " : " + str(instrument_symbol) + " at " + str(premium))
                 return order_id

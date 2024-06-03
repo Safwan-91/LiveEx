@@ -5,6 +5,7 @@ import liveUtils
 from PriceStream import PriceStream
 
 import Utils
+from Users import User
 from runLive import Live
 from datetime import datetime
 from pyIB_APIS import IB_APIS
@@ -18,6 +19,7 @@ def runStrategy(client, priceDict):
 
 
 def main():
+    # fath = User("fathima")
     Utils.logger.info("Starting the program")
     client = IB_APIS("http://localhost:21000")
     priceStream = PriceStream()
