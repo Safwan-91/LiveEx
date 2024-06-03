@@ -9,7 +9,7 @@ users = {
     #     "2fa": "MHG22VYK4B2I56KS4X567N2UG7M363A3",
     #     "imei": "12-mk"
     # },
-    "shoonya": {
+    "umma": {
         "broker": "shoonya",
         "userid": "FA227991",
         "password": "FaiSal@12",
@@ -18,7 +18,12 @@ users = {
         "2fa": "34477UN26JMYE35NU3DLT4M7LU464267",
         "imei": "abc1234"
     },
-    "kotak": {
-        "broker": "kotakNeo"
+    "fathima": {
+        "broker": "kotakNeo",
+        "consumer_key": "ifwErrRsS8I4xH5mSqEv5iIKrRka",
+        "consumer_secret": "d2WkapFVp1HAUVxYi9fuSg_TM5oa",
+        "mobilenumber": "9037265906",
+        "password": "LasFath@12",
+        "mpin": "123456"
     }
 }
