@@ -1,10 +1,5 @@
-import time
-
-import asyncio
-
-import Utils
-from strategy import Strategy
-import liveUtils
+from core.strategy import Strategy
+from utils import liveUtils, Utils
 
 
 class Live:
@@ -23,7 +18,7 @@ class Live:
 
         self.checkMTMs(priceDict)
 
-        self.piyushAdjustment(priceDict[Utils.index],currentime, priceDict)
+        self.piyushAdjustment(priceDict[Utils.index], currentime, priceDict)
 
     def start(self, spot, priceDict, currentime):
         task = [(strategy.start, (spot, priceDict, currentime)) for strategy in self.strategy]

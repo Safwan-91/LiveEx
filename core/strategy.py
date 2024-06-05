@@ -1,8 +1,7 @@
 import time
 
-import Straddle
-import Utils
-import liveUtils
+from core import Straddle
+from utils import liveUtils, Utils
 
 
 class Strategy:

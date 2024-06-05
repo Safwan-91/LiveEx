@@ -3,9 +3,8 @@ import threading
 import time
 from datetime import date
 
-from Users import users
-
-import Utils
+from user.Users import users
+from utils import Utils
 
 
 def getQuote(symbol, stxoSymbol, priceDict):
@@ -69,4 +68,4 @@ def getShonyaSymbol(strike, exp_date, type):
     else:
         expDate = str(date.today().day) + Utils.expDate[-3:] + Utils.expDate[:2]
     return Utils.index + expDate + type[
-        0] + strike if Utils.index not in ["SENSEX","BANKEX"] else Utils.index + exp_date + strike + type
+        0] + strike if Utils.index not in ["SENSEX", "BANKEX"] else Utils.index + exp_date + strike + type
