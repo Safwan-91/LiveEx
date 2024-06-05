@@ -30,7 +30,7 @@ class Live:
         liveUtils.execute_in_parallel(task)
 
     def checkMTMs(self, priceDict):
-        task = [(strategy.checkmtmhit, (priceDict, 1)) for strategy in self.strategy]
+        task = [(strategy.checkmtmhit, (priceDict,)) for strategy in self.strategy]
         liveUtils.execute_in_parallel(task)
 
     def piyushAdjustment(self, spot, currentime, priceDict):

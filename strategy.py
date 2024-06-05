@@ -60,7 +60,7 @@ class Strategy:
         Utils.logger.info("strategy_" + str(
             self.strategyNo) + " - " + "piyush adjustment check and adjustments if any done successfully")
 
-    def checkmtmhit(self, priceDict, jff):
+    def checkmtmhit(self, priceDict):
         if self.mtmhit or (self.started and (
                 self.straddle.getProfit(priceDict) < -Utils.mtmStopLoss)):
             if not self.mtmhit:
