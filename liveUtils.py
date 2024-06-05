@@ -13,17 +13,17 @@ def getQuote(symbol, stxoSymbol, priceDict):
     tryNo = 0
     while tryNo <= 5:
         try:
-            users[0].IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
+            users[0].client.IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
             if symbol not in priceDict["addons"]:
                 priceDict["addons"].append(symbol)
             time.sleep(0.1)
             # Utils.logger.debug("strategy_"+str(self.strategyNo)+" - "+"fetching quote for {} for {}th try".format(symbol, tryNo))
-            ltp = users[0].IB_LTP(Utils.fnoExchange, stxoSymbol, "")
+            ltp = users[0].client.IB_LTP(Utils.fnoExchange, stxoSymbol, "")
             Utils.logger.debug("strategy_" + " - " + "quote fetched with ltp " + str(ltp))
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
             if ltp == 0:
                 Utils.logger.debug("strategy_" + " - " + "get quote attempt failed " + str(ltp))
-                users[0].IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
+                users[0].client.IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
                 tryNo += 1
                 time.sleep(0.5)
                 continue

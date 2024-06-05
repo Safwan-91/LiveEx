@@ -102,8 +102,7 @@ class LEG:
             Utils.logger.info("strategy_" + str(
                 self.strategyNo) + " - " + self.type + " leg adjustment occured, initiating order placement")
             if self.currentAdjustmentLevel == Utils.noOfAdjustment:
-                threading.Thread(target=self.exit, args=(priceDict)).start()
-                self.premium = 0
+                threading.Thread(target=self.exit, args=(priceDict,)).start()
                 self.currentAdjustmentLevel += 1
                 # self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(client)
                 # self.hedge.premium = 0
@@ -169,6 +168,7 @@ class LEG:
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "exiting leg")
         liveUtils.placeOrder(self.getSymbol(), getOppTransaction(self.transactionType),
                              priceDict[self.symbol], self.strategyNo)
+        self.premium = 0
         if self.hedge:
             self.hedge.exit(priceDict)
 
