@@ -2,9 +2,8 @@ import calendar
 import threading
 from datetime import date
 
-import Utils
-import liveUtils
-from Utils import *
+from utils import liveUtils, Utils
+from utils.Utils import *
 
 
 def getOppTransaction(transactionType):
@@ -182,7 +181,7 @@ class LEG:
         else:
             expDate = str(date.today().day) + self.exp_date[-3:] + self.exp_date[:2]
         return Utils.index + expDate + self.type[
-            0] + strike if Utils.index not in ["SENSEX","BANKEX"] else Utils.index + self.exp_date + strike + self.type
+            0] + strike if Utils.index not in ["SENSEX", "BANKEX"] else Utils.index + self.exp_date + strike + self.type
 
     def getSymbol(self, strike=None):
         if not strike:

@@ -1,4 +1,4 @@
-activeUsers = ["fathima"]
+activeUsers = [""]
 users = {
     # "shoonya": {
     #     "broker": "shoonya",

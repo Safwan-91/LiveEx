@@ -1,9 +1,5 @@
-import Utils
-import liveUtils
-from shonya import Shonya
-
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
+from utils import liveUtils, Utils
+from user.shonya import Shonya
 
 
 class PriceStream:

@@ -3,9 +3,9 @@ import time
 from NorenRestApiPy.NorenApi import NorenApi
 from neo_api_client import NeoAPI
 
-import Utils
-import userDetails
-from pyIB_APIS import IB_APIS
+from user import userDetails
+from utils import Utils
+from ioUtils.pyIB_APIS import IB_APIS
 
 
 def fetchDetails(id):
@@ -52,9 +52,9 @@ class User:
             elif self.userDetails["broker"] == "shoonya":
                 transaction_type = transaction_type[0].upper()
                 order_id = self.client.place_order(buy_or_sell=transaction_type, product_type='M',
-                        exchange='NFO', tradingsymbol=instrument_symbol,
-                        quantity= Utils.lotSize, discloseqty=0, price_type='MKT', #price=200.00, trigger_price=199.50,
-                        retention='DAY', remarks='my_order_001')["norenordno"]
+                                                   exchange='NFO', tradingsymbol=instrument_symbol,
+                                                   quantity= Utils.lotSize, discloseqty=0, price_type='MKT',  #price=200.00, trigger_price=199.50,
+                                                   retention='DAY', remarks='my_order_001')["norenordno"]
             Utils.logger.debug("order placed for user {} with order id {}".format(self.id, order_id))
             return order_id
         except Exception as e:
@@ -86,19 +86,19 @@ class User:
         orderID = None
         while tryNo < 5:
             orderID = self.client.IB_MappedOrderAdv(SignalID=0,
-                                               StrategyTag=Utils.strategyTag[strategyNo],
-                                               SourceSymbol=instrument_symbol,
-                                               TransactionType=transaction_type,
-                                               OrderType="MARKET",
-                                               ProductType="NRML",
-                                               Price="",
-                                               TriggerPrice="",
-                                               Quantity=Utils.lotSize,
-                                               ProfitValue="",
-                                               StoplossValue="",
-                                               SLTrailingValue="",
-                                               SignalLTP=0,
-                                               OptionsType="")
+                                                    StrategyTag=Utils.strategyTag[strategyNo],
+                                                    SourceSymbol=instrument_symbol,
+                                                    TransactionType=transaction_type,
+                                                    OrderType="MARKET",
+                                                    ProductType="NRML",
+                                                    Price="",
+                                                    TriggerPrice="",
+                                                    Quantity=Utils.lotSize,
+                                                    ProfitValue="",
+                                                    StoplossValue="",
+                                                    SLTrailingValue="",
+                                                    SignalLTP=0,
+                                                    OptionsType="")
             Utils.logger.debug(
                 "strategy_" + str(strategyNo) + " - " + "order placed with orderID {} and tryNo {}".format(orderID,
                                                                                                            tryNo))

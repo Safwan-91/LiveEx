@@ -1,9 +1,9 @@
 import time
 
-from PriceStream import PriceStream
+from ioUtils.PriceStream import PriceStream
 
-import Utils
-from runLive import Live
+from utils import Utils
+from core.runLive import Live
 from datetime import datetime
 
 runLive = Live()

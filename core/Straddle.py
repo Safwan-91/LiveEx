@@ -1,4 +1,6 @@
-from Leg import *
+from core.Leg import LEG
+from utils import Utils, liveUtils
+from utils.Utils import initialPremium
 
 
 class STRADDLE:
@@ -15,7 +17,7 @@ class STRADDLE:
         return self.ce.getLegProfit(priceDict) + self.pe.getLegProfit(priceDict)
 
     def setupStraddle(self, spot, priceDict):
-        Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"setting up initial position at " + str(spot))
+        Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "setting up initial position at " + str(spot))
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         liveUtils.execute_in_parallel([(self.ce.setStrike, (initialPremium, atm, priceDict)), (self.pe.setStrike, (initialPremium, atm, priceDict))])
         self.strikeStack = []
@@ -40,12 +42,12 @@ class STRADDLE:
             self.mean.pop()
             self.pe.updatePremium(priceDict)
             self.ce.reEnter(self.strikeStack.pop(), priceDict)
-            Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"after rematch the premiums are, ce - {}, pe - {}".format(self.ce.premium, self.pe.premium))
+            Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "after rematch the premiums are, ce - {}, pe - {}".format(self.ce.premium, self.pe.premium))
         elif self.pe.currentAdjustmentLevel >= 1 and spot > self.mean[-2]:
             self.mean.pop()
             self.ce.updatePremium(priceDict)
             self.pe.reEnter(self.strikeStack.pop(), priceDict)
-            Utils.logger.info("strategy_"+str(self.strategyNo)+" - "+"after rematch the premiums are, ce - {}, pe - {}".format(self.ce.premium, self.pe.premium))
+            Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "after rematch the premiums are, ce - {}, pe - {}".format(self.ce.premium, self.pe.premium))
 
     def exit(self, priceDict):
         profit = self.getProfit(priceDict)
