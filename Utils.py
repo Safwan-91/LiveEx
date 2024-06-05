@@ -2,8 +2,8 @@ import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
-index = "FINNIFTY"
-expDate = "24604"
+index = "BANKNIFTY"
+expDate = "24605"
 indexExchange = "NSE"
 fnoExchange = "NFO"
 hedgeDist = 30
@@ -22,7 +22,7 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter(formatter))
 logger.addHandler(console_handler)
 
-initialPremiumMap = {"MIDCPNIFTY": 25, "FINNIFTY": 4000, "BANKNIFTY": 110, "NIFTY": 50, "SENSEX": 163, "BANKEX": 125}
+initialPremiumMap = {"MIDCPNIFTY": 25, "FINNIFTY": 40, "BANKNIFTY": 110, "NIFTY": 50, "SENSEX": 163, "BANKEX": 125}
 mtmSLMap = {"MIDCPNIFTY": 10, "FINNIFTY": 25, "BANKNIFTY": 70, "NIFTY": 30, "SENSEX": 100, "BANKEX": 80}
 strikeDifferenceMap = {"MIDCPNIFTY": 25, "FINNIFTY": 50, "BANKNIFTY": 100, "NIFTY": 50, "SENSEX": 100, "BANKEX": 100}
 indexTokenMap = {"MIDCPNIFTY": "26074", "FINNIFTY": "26037", "BANKNIFTY": "26009", "NIFTY": "26000", "SENSEX": "1", "BANKEX": "12"}
