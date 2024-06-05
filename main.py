@@ -27,7 +27,7 @@ def main():
         current_time = datetime.now()
         sleep_time = 60 - current_time.second - (current_time.microsecond / 1000000.0)
         time.sleep(sleep_time)
-        if current_time.strftime("%H:%M:%S") > "24:30:00":
+        if current_time.strftime("%H:%M:%S") > "15:30:00":
             break
 
 
