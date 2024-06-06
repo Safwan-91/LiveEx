@@ -4,7 +4,7 @@ from NorenRestApiPy.NorenApi import NorenApi
 from neo_api_client import NeoAPI
 
 from user import userDetails
-from utils import Utils
+from utils import Utils, Constants
 from ioUtils.pyIB_APIS import IB_APIS
 
 
@@ -39,7 +39,7 @@ class User:
 
 
     def placeOrder(self, instrument_token, instrument_symbol, transaction_type, premium, quantity):
-        quantity = str(quantity*15)
+        quantity = str(Constants.lotQuantityMap[Utils.index])
         try:
             order_id = None
             if self.userDetails["broker"] == "kotakNeo":
@@ -76,6 +76,8 @@ class User:
     def placeAndConfirmOrder(self,instrument_token, instrument_symbol, transaction_type, premium, quantity, strategyNo):
         if self.userDetails["broker"] == "stxo":
             self.placeAndConfirmOrderStxo(instrument_token, instrument_symbol, transaction_type, premium, quantity, strategyNo)
+            return
+        if strategyNo not in self.userDetails["strategies"]:
             return
         orderId = self.placeOrder(instrument_token, instrument_symbol, transaction_type, premium, quantity)
         self.confirmOrderStatus(orderId)

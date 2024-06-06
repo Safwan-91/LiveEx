@@ -16,7 +16,8 @@ users = {
         "vendorCode": "FA227991_U",
         "secret": "9fbf6b797b8f967d04b427fee8d16886",
         "2fa": "34477UN26JMYE35NU3DLT4M7LU464267",
-        "imei": "abc1234"
+        "imei": "abc1234",
+        "strategies": ""
     },
     "fathima": {
         "broker": "kotakNeo",
@@ -24,7 +25,8 @@ users = {
         "consumer_secret": "d2WkapFVp1HAUVxYi9fuSg_TM5oa",
         "mobilenumber": "9037265906",
         "password": "LasFath@12",
-        "mpin": "123456"
+        "mpin": "123456",
+        "strategies": [1,]
     },
     "stxo": {
         "broker": "stxo"
