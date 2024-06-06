@@ -38,7 +38,7 @@ class Strategy:
         return self.straddle.exit(priceDict)
 
     def piyushAdjustment(self, spot, currentTime, priceDict):
-        if self.mtmhit:
+        if self.mtmhit or not self.started:
             return
         Utils.logger.info(
             "strategy_" + str(self.strategyNo) + " - " + "checking for piyush adjustment, spot is " + str(spot))
