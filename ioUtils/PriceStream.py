@@ -4,11 +4,12 @@ from user.shonya import Shonya
 
 class PriceStream:
     def __init__(self):
-        self.api = Shonya(client_id='1').login()
+        self.api = Shonya(client_id='def').login()
         self.feedStarted = False
         self.expDate = Utils.expDate
         self.priceDict = {}
         self.tickSymbolMap = {}
+        self.l = []
 
     def connect(self):
         def event_handler_feed_update(tick_data):
@@ -21,19 +22,18 @@ class PriceStream:
                     self.priceDict["addons"] = []
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
                     atm = int(round(float(tick_data["lp"]) / Utils.strikeDifference) * Utils.strikeDifference)
-                    l = []
-                    for i in range(0,10):
+                    for i in range(0,15):
                         symbolce = liveUtils.getShonyaSymbol(str(atm + i * Utils.strikeDifference), Utils.expDate, "CE")
                         symbolpe = liveUtils.getShonyaSymbol(str(atm - i * Utils.strikeDifference), Utils.expDate, "PE")
                         tokence = self.api.searchscrip(Utils.fnoExchange, symbolce)["values"][0]["token"]
                         tokenpe = self.api.searchscrip(Utils.fnoExchange, symbolpe)["values"][0]["token"]
-                        l.append(Utils.fnoExchange + '|' + tokence)
-                        l.append(Utils.fnoExchange + '|' + tokenpe)
+                        self.l.append(Utils.fnoExchange + '|' + tokence)
+                        self.l.append(Utils.fnoExchange + '|' + tokenpe)
                         self.tickSymbolMap[tokence] = symbolce
                         self.tickSymbolMap[tokenpe] = symbolpe
                     self.feedStarted = True
-                    self.api.subscribe(l)
-                    print("all subscribed")
+                    self.api.subscribe(self.l)
+                    Utils.logger.debug("all subscribed")
                 else:
                     if "lp" in tick_data:
                         self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
@@ -52,6 +52,9 @@ class PriceStream:
 
         def open_callback():
             Utils.logger.debug("in open callback")
+            if self.l:
+                self.api.subscribe(self.l)
+                Utils.logger.debug("all subscribed")
             self.api.subscribe(
                 Utils.indexExchange + '|' + Utils.indexToken)
 
