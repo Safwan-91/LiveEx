@@ -37,13 +37,13 @@ class Shonya(object):
             # self.wss = None
             self.vc = 'FA145842_U'
         else:
-            self.uid = 'FA76209'
-            self.pwd = 'Strangle@28'
-            self.factor2 = None
+            self.uid = 'FA175005'
+            self.pwd = 'Strangle@27'
+            self.factor2 = pyotp.TOTP('3ZQ64ZJ3LPSX64AL4J4MI3QGUIU527L7')
             self.imei = '60-45-CB-C5-A7-49'
-            self.app_key = '6aa1e19981a9f1eeef8b2a96598ef3e3'
+            self.app_key = 'fa33bde95e69245faf636528e259083f'
             # self.wss = None
-            self.vc = 'FA76209_U'
+            self.vc = 'FA175005_U'
 
     def login(self):
 
