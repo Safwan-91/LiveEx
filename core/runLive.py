@@ -6,7 +6,7 @@ class Live:
     def __init__(self):
         self.mtmhit = None
         self.expDate = Utils.expDate
-        self.strategy = [Strategy("sell", strategyNo) for strategyNo in range(4)]
+        self.strategy = [Strategy("sell", strategyNo) for strategyNo in range(6)]
         self.hedge = False
 
     def callback_method(self, currentime, priceDict):

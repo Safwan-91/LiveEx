@@ -2,15 +2,15 @@ import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 
-index = "BANKNIFTY"
-expDate = "24605"
+index = "NIFTY"
+expDate = "24620"
 indexExchange = "NSE"
 fnoExchange = "NFO"
-hedgeDist = 30
+hedgeDist = 20
 
-startTime = ["09:44:00", "09:44:00", "10:44:00", "10:44:00"]
-adjSL = [1,2,1,2]
-strategyTag = ["OPTIONSPLAY945SL1", "OPTIONSPLAY945SL2", "OPTIONSPLAY1045SL1", "OPTIONSPLAY1045SL2"]
+startTime = ["09:44:00", "09:44:00", "10:44:00", "10:44:00", "10:14:00", "10:14:00"]
+adjSL = [1, 2, 1, 2, 1, 2]
+strategyTag = ["OPTIONSPLAY945SL1", "OPTIONSPLAY945SL2", "OPTIONSPLAY1045SL1", "OPTIONSPLAY1045SL2", "OPTIONSPLAY1015SL1", "OPTIONSPLAY1015SL2"]
 
 executor = ThreadPoolExecutor()
 
@@ -33,7 +33,7 @@ adjustmentShift = "True"
 shiftAmount = [shiftAmountMap[index] if sl == 1 else shiftAmountMap[index] + 1 for sl in adjSL]
 indexToken = indexTokenMap[index]
 lotSize = lotSizeMap[index]
-SLMap = {0: [0.3, 0.3, 0.3, 0.3], 1: adjSL, 2: 0}
+SLMap = {0: [0.3, 0.3, 0.3, 0.3, 0.3, 0.3], 1: adjSL, 2: 0}
 adjustmentPercent = 0.3
 initialPremium = initialPremiumMap[index]
 mtmStopLoss = mtmSLMap[index]

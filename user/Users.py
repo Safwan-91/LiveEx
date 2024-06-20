@@ -128,9 +128,4 @@ class User:
                 continue
 
 
-
-
-
-
-
-users = [User("stxo")]
+users = [User("stxo"), User("fathima")]
