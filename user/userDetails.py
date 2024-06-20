@@ -26,7 +26,7 @@ users = {
         "mobilenumber": "9037265906",
         "password": "LasFath@12",
         "mpin": "123456",
-        "strategies": [1,]
+        "strategies": [0, 1, ]
     },
     "stxo": {
         "broker": "stxo"
