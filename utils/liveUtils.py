@@ -39,8 +39,8 @@ def placeOrder(instrument_symbol, transaction_type, premium, strategyNo):
     Utils.logger.info("strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
                                                                                                      instrument_symbol,
                                                                                                      premium))
-    for user in users:
-        user.placeAndConfirmOrder("", instrument_symbol, transaction_type, premium, Utils.lotSize, strategyNo)
+    task = [(user.placeAndConfirmOrder, ("", instrument_symbol, transaction_type, premium, Utils.lotSize, strategyNo)) for user in users]
+    execute_in_parallel(task)
 
 
 def execute_in_parallel(funcs_and_args):

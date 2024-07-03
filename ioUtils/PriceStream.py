@@ -22,7 +22,7 @@ class PriceStream:
                     self.priceDict["addons"] = []
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
                     atm = int(round(float(tick_data["lp"]) / Utils.strikeDifference) * Utils.strikeDifference)
-                    for i in range(0,15):
+                    for i in range(-5,15):
                         symbolce = liveUtils.getShonyaSymbol(str(atm + i * Utils.strikeDifference), Utils.expDate, "CE")
                         symbolpe = liveUtils.getShonyaSymbol(str(atm - i * Utils.strikeDifference), Utils.expDate, "PE")
                         tokence = self.api.searchscrip(Utils.fnoExchange, symbolce)["values"][0]["token"]
