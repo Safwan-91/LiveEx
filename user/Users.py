@@ -43,8 +43,9 @@ class User:
         try:
             order_id = None
             if self.userDetails["broker"] == "kotakNeo":
+                exch_segment = "bse_fo" if Utils.index in ["BANKEX", "SENSEX"] else "nse_fo"
                 transaction_type = transaction_type[0].upper()
-                result = self.client.place_order(exchange_segment="nse_fo", product="NRML", price="",
+                result = self.client.place_order(exchange_segment=exch_segment, product="NRML", price="",
                                                    order_type="MKT", quantity=quantity, validity="DAY",
                                                    trading_symbol=instrument_symbol,
                                                    transaction_type=transaction_type)
@@ -62,7 +63,7 @@ class User:
 
     def confirmOrderStatus(self,orderid):
         tryNo = 0
-        while tryNo <= 100:
+        while tryNo <= 10:
             try:
                 if self.userDetails["broker"] == "kotakNeo":
                     if self.client.order_history(orderid)["data"]["data"][0]["ordSt"] in ["completed","rejected"]:
@@ -72,6 +73,7 @@ class User:
                         time.sleep(0.1)
             except Exception as e:
                 Utils.logger.debug("error while confirming order for user {}. error - {}".format(self.id, e))
+                tryNo+=1
 
     def placeAndConfirmOrder(self,instrument_token, instrument_symbol, transaction_type, premium, quantity, strategyNo):
         if self.userDetails["broker"] == "stxo":
