@@ -37,9 +37,8 @@ class User:
             client = IB_APIS("http://localhost:21000")
             return client
 
-
     def placeOrder(self, instrument_token, instrument_symbol, transaction_type, premium, quantity):
-        quantity = str(Constants.lotQuantityMap[Utils.index])
+        quantity = str(Constants.lotQuantityMap[Utils.index] * Utils.lotSize)
         try:
             order_id = None
             if self.userDetails["broker"] == "kotakNeo":
@@ -61,30 +60,33 @@ class User:
         except Exception as e:
             Utils.logger.debug("error while placing order for user {}. error - {}".format(self.id, result))
 
-    def confirmOrderStatus(self,orderid):
+    def confirmOrderStatus(self, orderid):
         tryNo = 0
         while tryNo <= 10:
             try:
                 if self.userDetails["broker"] == "kotakNeo":
-                    if self.client.order_history(orderid)["data"]["data"][0]["ordSt"] in ["completed","rejected"]:
+                    if self.client.order_history(orderid)["data"]["data"][0]["ordSt"] in ["complete", "rejected"]:
                         Utils.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
                         break
                     else:
                         time.sleep(0.1)
             except Exception as e:
                 Utils.logger.debug("error while confirming order for user {}. error - {}".format(self.id, e))
-                tryNo+=1
+                tryNo += 1
 
-    def placeAndConfirmOrder(self,instrument_token, instrument_symbol, transaction_type, premium, quantity, strategyNo):
+    def placeAndConfirmOrder(self, instrument_token, instrument_symbol, transaction_type, premium, quantity,
+                             strategyNo):
         if self.userDetails["broker"] == "stxo":
-            self.placeAndConfirmOrderStxo(instrument_token, instrument_symbol, transaction_type, premium, quantity, strategyNo)
+            self.placeAndConfirmOrderStxo(instrument_token, instrument_symbol, transaction_type, premium, quantity,
+                                          strategyNo)
             return
         if strategyNo not in self.userDetails["strategies"]:
             return
         orderId = self.placeOrder(instrument_token, instrument_symbol, transaction_type, premium, quantity)
         self.confirmOrderStatus(orderId)
 
-    def placeAndConfirmOrderStxo(self, instrument_token, instrument_symbol, transaction_type, premium, quantity, strategyNo):
+    def placeAndConfirmOrderStxo(self, instrument_token, instrument_symbol, transaction_type, premium, quantity,
+                                 strategyNo):
         transaction_type = "LE" if transaction_type == "buy" else "SE"
         tryNo = 0
         orderID = None
