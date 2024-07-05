@@ -1,4 +1,5 @@
 import calendar
+import pickle
 import threading
 import time
 from datetime import date
@@ -69,3 +70,14 @@ def getShonyaSymbol(strike, exp_date, type):
         expDate = str(date.today().day) + Utils.expDate[-3:] + Utils.expDate[:2]
     return Utils.index + expDate + type[
         0] + strike if Utils.index not in ["SENSEX", "BANKEX"] else Utils.index + exp_date + strike + type
+
+def dumpObject(obj,name):
+    fileObj = open(name+'.obj', 'wb')
+    pickle.dump(obj,fileObj)
+    fileObj.close()
+
+def loadObject(name):
+    dbfile = open(name+'.obj', 'rb')
+    db = pickle.load(dbfile)
+    dbfile.close()
+    return db
