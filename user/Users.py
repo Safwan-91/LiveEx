@@ -1,5 +1,6 @@
 import time
 
+import pyotp
 from NorenRestApiPy.NorenApi import NorenApi
 from neo_api_client import NeoAPI
 
@@ -21,9 +22,9 @@ class User:
     def login(self):
         if self.userDetails["broker"] == "shoonya":
             api = NorenApi(host='https://api.shoonya.com/NorenWClientTP/',
-                           websocket='wss://api.shoonya.com/NorenWSTP/')
-            api.login(userid=self.userDetails["userid"], password=self.userDetails["password"],
-                      twoFA=input("enter shoonya otp "), vendor_code=self.userDetails["vendorCode"],
+                                  websocket='wss://api.shoonya.com/NorenWSTP/')
+            ret = api.login(userid=self.userDetails["userid"], password=self.userDetails["password"],
+                      twoFA=pyotp.TOTP(self.userDetails["2fa"]).now(), vendor_code=self.userDetails["vendorCode"],
                       api_secret=self.userDetails["secret"], imei=self.userDetails["imei"])
             return api
         elif self.userDetails["broker"] == "kotakNeo":
@@ -51,10 +52,11 @@ class User:
                 order_id = result["nOrdNo"]
             elif self.userDetails["broker"] == "shoonya":
                 transaction_type = transaction_type[0].upper()
-                order_id = self.client.place_order(buy_or_sell=transaction_type, product_type='M',
-                                                   exchange='NFO', tradingsymbol=instrument_symbol,
+                result = self.client.place_order(buy_or_sell=transaction_type, product_type='M',
+                                                   exchange='NFO', tradingsymbol= instrument_token,
                                                    quantity= Utils.lotSize, discloseqty=0, price_type='MKT',  #price=200.00, trigger_price=199.50,
-                                                   retention='DAY', remarks='my_order_001')["norenordno"]
+                                                   retention='DAY', remarks='my_order_001')
+                order_id = result["norenordno"]
             Utils.logger.debug("order placed for user {} with order id {}".format(self.id, order_id))
             return order_id
         except Exception as e:
@@ -69,7 +71,13 @@ class User:
                         Utils.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
                         break
                     else:
-                        time.sleep(0.1)
+                        time.sleep(0.05)
+                if self.userDetails["broker"] == "shoonya":
+                    if self.client.single_order_history(orderid)[0]["status"] in ["COMPLETE", "REJECTED"]:
+                        Utils.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
+                        break
+                    else:
+                        time.sleep(0.05)
             except Exception as e:
                 Utils.logger.debug("error while confirming order for user {}. error - {}".format(self.id, e))
                 tryNo += 1
@@ -132,4 +140,4 @@ class User:
                 continue
 
 
-users = [User("stxo"), User("fathima")]
+users = [User("umma")]
