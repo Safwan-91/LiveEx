@@ -76,6 +76,9 @@ class Strategy:
         atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
         symbolce = Utils.index + Utils.expDate + str(int(atm) + Utils.hedgeDist * Utils.strikeDifference) + "CE"
         symbolpe = Utils.index + Utils.expDate + str(int(atm) - Utils.hedgeDist * Utils.strikeDifference) + "PE"
-        liveUtils.placeOrder(symbolce, "buy", 0, self.strategyNo)
-        liveUtils.placeOrder(symbolpe, "buy", 0, self.strategyNo)
+        shonyaSymbolce = liveUtils.getShonyaSymbol(str(int(atm) + Utils.hedgeDist * Utils.strikeDifference), Utils.expDate, "CE")
+        shonyaSymbolpe = liveUtils.getShonyaSymbol(str(int(atm) - Utils.hedgeDist * Utils.strikeDifference),
+                                                   Utils.expDate, "PE")
+        liveUtils.placeOrder(shonyaSymbolce, symbolce, "buy", 0, self.strategyNo)
+        liveUtils.placeOrder(shonyaSymbolpe, symbolpe, "buy", 0, self.strategyNo)
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "hedge bought successfully")

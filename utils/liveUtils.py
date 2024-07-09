@@ -35,11 +35,11 @@ def getQuote(symbol, stxoSymbol, priceDict):
                 return e
 
 
-def placeOrder(instrument_symbol, transaction_type, premium, strategyNo):
+def placeOrder(shonyaSymbol, instrument_symbol, transaction_type, premium, strategyNo):
     Utils.logger.info("strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
                                                                                                      instrument_symbol,
                                                                                                      premium))
-    task = [(user.placeAndConfirmOrder, ("", instrument_symbol, transaction_type, premium, Utils.lotSize, strategyNo)) for user in users]
+    task = [(user.placeAndConfirmOrder, (shonyaSymbol, instrument_symbol, transaction_type, premium, Utils.lotSize, strategyNo)) for user in users]
     execute_in_parallel(task)
 
 

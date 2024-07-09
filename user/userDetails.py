@@ -12,12 +12,12 @@ users = {
     "umma": {
         "broker": "shoonya",
         "userid": "FA227991",
-        "password": "FaiSal@12",
+        "password": "FaiSal@123",
         "vendorCode": "FA227991_U",
         "secret": "9fbf6b797b8f967d04b427fee8d16886",
         "2fa": "34477UN26JMYE35NU3DLT4M7LU464267",
         "imei": "abc1234",
-        "strategies": ""
+        "strategies": [0, 1, 2, 3, 4, 5]
     },
     "fathima": {
         "broker": "kotakNeo",

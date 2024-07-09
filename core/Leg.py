@@ -55,7 +55,7 @@ class LEG:
         #     self.setHedge(20, tokenData, users)
         self.symbol = symbol
         self.premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(), priceDict)
-        liveUtils.placeOrder(self.getSymbol(), self.transactionType, self.premium, self.strategyNo)
+        liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), self.transactionType, self.premium, self.strategyNo)
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " +
                           self.type + " parameters set with strike {} and premium {}".format(self.Strike,
                                                                                              self.premium), )
@@ -107,7 +107,7 @@ class LEG:
                 # self.hedge.premium = 0
                 return int(initialStrike)
             else:
-                liveUtils.placeOrder(self.getSymbol(), getOppTransaction(self.transactionType),
+                liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
                                      priceDict[self.symbol], self.strategyNo)
                 self.setStrike(adjustmentPercent * self.premium, None, priceDict)
                 # self.setHedge(priceDict, 20, tokenData)
@@ -124,7 +124,7 @@ class LEG:
             Utils.logger.info(
                 "strategy_" + str(self.strategyNo) + " - " + self.type + " leg rematch occured, initiating rematch ")
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-            liveUtils.placeOrder(self.getSymbol(), getOppTransaction(self.transactionType),
+            liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
                                  priceDict[self.symbol], self.strategyNo)
             symbol = self.getShonyaSymbol(str(straddleCentre))
             self.premium = 0
@@ -136,7 +136,7 @@ class LEG:
     def shiftIn(self, priceDict):
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "shifting in initialized for " + self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-        liveUtils.placeOrder(self.getSymbol(), getOppTransaction(self.transactionType),
+        liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
                              priceDict[self.symbol], self.strategyNo)
         symbol = self.getShonyaSymbol(str(int(self.Strike) - Utils.shiftAmount[self.strategyNo] * self.shift))
         self.setLegPars(symbol, priceDict)
@@ -165,7 +165,7 @@ class LEG:
         if not self.premium:
             return
         Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "exiting leg")
-        liveUtils.placeOrder(self.getSymbol(), getOppTransaction(self.transactionType),
+        liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
                              priceDict[self.symbol], self.strategyNo)
         self.premium = 0
         if self.hedge:
