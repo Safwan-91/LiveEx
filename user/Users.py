@@ -73,7 +73,7 @@ class User:
                     else:
                         time.sleep(0.1)
                 if self.userDetails["broker"] == "shoonya":
-                    if self.client.single_order_history(orderid)[0]["status"] in ["COMPLETED", "REJECTED"]:
+                    if self.client.single_order_history(orderid)[0]["status"] in ["COMPLETE", "REJECTED"]:
                         Utils.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
                         break
                     else:
@@ -140,4 +140,4 @@ class User:
                 continue
 
 
-users = [User("stxo")]
+users = [User("umma")]
