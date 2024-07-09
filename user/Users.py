@@ -71,13 +71,13 @@ class User:
                         Utils.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
                         break
                     else:
-                        time.sleep(0.1)
+                        time.sleep(0.05)
                 if self.userDetails["broker"] == "shoonya":
                     if self.client.single_order_history(orderid)[0]["status"] in ["COMPLETE", "REJECTED"]:
                         Utils.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
                         break
                     else:
-                        time.sleep(0.1)
+                        time.sleep(0.05)
             except Exception as e:
                 Utils.logger.debug("error while confirming order for user {}. error - {}".format(self.id, e))
                 tryNo += 1
