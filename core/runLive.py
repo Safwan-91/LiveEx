@@ -23,6 +23,9 @@ class Live:
 
         self.piyushAdjustment(priceDict[Utils.index], currentime, priceDict)
 
+        if currentime == "15:25:00":
+            self.exitPositionalStrategies()
+
     def start(self, spot, priceDict, currentime):
         task = [(strategy.start, (spot, priceDict, currentime)) for strategy in self.strategy]
         liveUtils.execute_in_parallel(task)
@@ -38,3 +41,7 @@ class Live:
     def loadPositionalStrategies(self):
         for file in os.listdir(Constants.positionalObjectsPath):
             strategy = liveUtils.loadObject(file)
+            st
+
+    def exitPositionalStrategies(self):
+        pass
