@@ -14,10 +14,11 @@ class Strategy:
         self.rematchStack = []
         self.currentAdjustmentLevel = 0
         self.started = False
+        self.isPositional = False
 
     def start(self, spot, priceDict, currentime):
         if self.started or currentime < Utils.startTime[self.strategyNo]:
-            return
+            pass
 
         if not self.hedge and currentime >= Utils.startTime[self.strategyNo]:
             self.buyHedge(priceDict)
