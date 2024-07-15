@@ -5,7 +5,7 @@ import time
 from datetime import date
 
 from user.Users import users
-from utils import Utils
+from utils import Utils, Constants
 
 
 def getQuote(symbol, stxoSymbol, priceDict):
@@ -17,19 +17,19 @@ def getQuote(symbol, stxoSymbol, priceDict):
             if symbol not in priceDict["addons"]:
                 priceDict["addons"].append(symbol)
             time.sleep(0.1)
-            # Utils.logger.debug("strategy_"+str(self.strategyNo)+" - "+"fetching quote for {} for {}th try".format(symbol, tryNo))
+            # Constants.logger.debug("strategy_"+str(self.strategyNo)+" - "+"fetching quote for {} for {}th try".format(symbol, tryNo))
             ltp = users[0].client.IB_LTP(Utils.fnoExchange, stxoSymbol, "")
-            Utils.logger.debug("strategy_" + " - " + "quote fetched with ltp " + str(ltp))
+            Constants.logger.debug("strategy_" + " - " + "quote fetched with ltp " + str(ltp))
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
             if ltp == 0:
-                Utils.logger.debug("strategy_" + " - " + "get quote attempt failed " + str(ltp))
+                Constants.logger.debug("strategy_" + " - " + "get quote attempt failed " + str(ltp))
                 users[0].client.IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
                 tryNo += 1
                 time.sleep(0.5)
                 continue
             return float(ltp)
         except Exception as e:
-            Utils.logger.error("Exception when calling get Quote api->quotes: %s\n" % e)
+            Constants.logger.error("Exception when calling get Quote api->quotes: %s\n" % e)
             tryNo += 1
             time.sleep(1)
             if tryNo == 5:
@@ -37,7 +37,7 @@ def getQuote(symbol, stxoSymbol, priceDict):
 
 
 def placeOrder(shonyaSymbol, instrument_symbol, transaction_type, premium, strategyNo):
-    Utils.logger.info("strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
+    Constants.logger.info("strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
                                                                                                      instrument_symbol,
                                                                                                      premium))
     task = [(user.placeAndConfirmOrder, (shonyaSymbol, instrument_symbol, transaction_type, premium, Utils.lotSize, strategyNo)) for user in users]

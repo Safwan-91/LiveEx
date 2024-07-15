@@ -57,10 +57,10 @@ class User:
                                                    quantity= Utils.lotSize, discloseqty=0, price_type='MKT',  #price=200.00, trigger_price=199.50,
                                                    retention='DAY', remarks='my_order_001')
                 order_id = result["norenordno"]
-            Utils.logger.debug("order placed for user {} with order id {}".format(self.id, order_id))
+            Constants.logger.debug("order placed for user {} with order id {}".format(self.id, order_id))
             return order_id
         except Exception as e:
-            Utils.logger.debug("error while placing order for user {}. error - {}".format(self.id, result))
+            Constants.logger.debug("error while placing order for user {}. error - {}".format(self.id, result))
 
     def confirmOrderStatus(self, orderid):
         tryNo = 0
@@ -68,18 +68,18 @@ class User:
             try:
                 if self.userDetails["broker"] == "kotakNeo":
                     if self.client.order_history(orderid)["data"]["data"][0]["ordSt"] in ["complete", "rejected"]:
-                        Utils.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
+                        Constants.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
                         break
                     else:
                         time.sleep(0.05)
                 if self.userDetails["broker"] == "shoonya":
                     if self.client.single_order_history(orderid)[0]["status"] in ["COMPLETE", "REJECTED"]:
-                        Utils.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
+                        Constants.logger.debug("order confirmed for user {} with order id {}".format(self.id, orderid))
                         break
                     else:
                         time.sleep(0.05)
             except Exception as e:
-                Utils.logger.debug("error while confirming order for user {}. error - {}".format(self.id, e))
+                Constants.logger.debug("error while confirming order for user {}. error - {}".format(self.id, e))
                 tryNo += 1
 
     def placeAndConfirmOrder(self, instrument_token, instrument_symbol, transaction_type, premium, quantity,
@@ -113,7 +113,7 @@ class User:
                                                     SLTrailingValue="",
                                                     SignalLTP=0,
                                                     OptionsType="")
-            Utils.logger.debug(
+            Constants.logger.debug(
                 "strategy_" + str(strategyNo) + " - " + "order placed with orderID {} and tryNo {}".format(orderID,
                                                                                                            tryNo))
             if orderID:
@@ -128,16 +128,16 @@ class User:
                 for status in statuses.split(","):
                     if status not in ["completed", "rejected"]:
                         done = False
-                        # Utils.logger.warn("strategy_" + str(strategyNo) + " - " + "order not completed with status" + statuses)
+                        # Constants.logger.warn("strategy_" + str(strategyNo) + " - " + "order not completed with status" + statuses)
                         time.sleep(0.05)
                         break
                 if done:
-                    Utils.logger.info("strategy_" + str(strategyNo) + " - " + "order completed for all users")
+                    Constants.logger.info("strategy_" + str(strategyNo) + " - " + "order completed for all users")
                     break
             except Exception as e:
-                Utils.logger.error(e)
+                Constants.logger.error(e)
                 time.sleep(1)
                 continue
 
 
-users = [User("umma")]
+users = [User("fathima")]

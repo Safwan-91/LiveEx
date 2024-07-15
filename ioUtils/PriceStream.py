@@ -1,4 +1,4 @@
-from utils import liveUtils, Utils
+from utils import liveUtils, Utils, Constants
 from user.shonya import Shonya
 
 
@@ -22,7 +22,7 @@ class PriceStream:
                     self.priceDict["addons"] = []
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
                     atm = int(round(float(tick_data["lp"]) / Utils.strikeDifference) * Utils.strikeDifference)
-                    for i in range(-5,15):
+                    for i in range(-2,12):
                         symbolce = liveUtils.getShonyaSymbol(str(atm + i * Utils.strikeDifference), Utils.expDate, "CE")
                         symbolpe = liveUtils.getShonyaSymbol(str(atm - i * Utils.strikeDifference), Utils.expDate, "PE")
                         tokence = self.api.searchscrip(Utils.fnoExchange, symbolce)["values"][0]["token"]
@@ -33,14 +33,14 @@ class PriceStream:
                         self.tickSymbolMap[tokenpe] = symbolpe
                     self.feedStarted = True
                     self.api.subscribe(self.l)
-                    Utils.logger.debug("all subscribed")
+                    Constants.logger.debug("all subscribed")
                 else:
                     if "lp" in tick_data:
                         self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
                     elif "bp1" in tick_data:
                         self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["bp1"])
                 while len(self.priceDict["addons"]) != 0:
-                    Utils.logger.debug("inside subscribing addons for " + self.priceDict["addons"][-1])
+                    Constants.logger.debug("inside subscribing addons for " + self.priceDict["addons"][-1])
                     symbol = self.priceDict["addons"].pop()
                     token = self.api.searchscrip(Utils.fnoExchange, symbol)["values"][0][
                         "token"]
@@ -48,13 +48,13 @@ class PriceStream:
                     self.api.subscribe(Utils.fnoExchange + '|' + token)
 
             except Exception as e:
-                Utils.logger.error("Exception in price feed - {}".format(e))
+                Constants.logger.error("Exception in price feed - {}".format(e))
 
         def open_callback():
-            Utils.logger.debug("in open callback")
+            Constants.logger.debug("in open callback")
             if self.l:
                 self.api.subscribe(self.l)
-                Utils.logger.debug("all subscribed")
+                Constants.logger.debug("all subscribed")
             self.api.subscribe(
                 Utils.indexExchange + '|' + Utils.indexToken)
 

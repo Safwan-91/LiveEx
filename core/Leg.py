@@ -2,7 +2,7 @@ import calendar
 import threading
 from datetime import date
 
-from utils import liveUtils, Utils
+from utils import liveUtils, Utils, Constants
 from utils.Utils import *
 
 
@@ -29,7 +29,7 @@ class LEG:
         """
         fetches the strike which has premium closest to premium target.
         """
-        Utils.logger.info(
+        Constants.logger.info(
             "strategy_" + str(self.strategyNo) + " - " + "fetching strike for {} side with premium {}".format(self.type,
                                                                                                               premiumTarget))
         intialStrike = atm if atm else int(self.Strike)
@@ -40,23 +40,26 @@ class LEG:
             try:
                 premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(str(newStrike)), priceDict)
             except Exception as e:
-                Utils.logger.error(e)
+                Constants.logger.error(e)
             if premium < premiumTarget:
                 self.premium = premium
-                Utils.logger.info(
+                Constants.logger.info(
                     "strategy_" + str(self.strategyNo) + " - " + "{} fetched with premium {}".format(symbol, premium))
                 self.setLegPars(symbol, priceDict)
                 return symbol
             newStrike = newStrike + self.shift
 
     def setLegPars(self, symbol, priceDict):
+        if self.symbol:
+            liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
+                                 priceDict[self.symbol], self.strategyNo)
         self.Strike = symbol[-5:] if Utils.index not in ["SENSEX", "BANKEX"] else symbol[-7:-2]
-        # if self.transactionType == "sell" and not self.symbol:
-        #     self.setHedge(20, tokenData, users)
+        if self.transactionType == "sell" and not self.symbol:
+            self.setHedge(20, priceDict)
         self.symbol = symbol
         self.premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(), priceDict)
         liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), self.transactionType, self.premium, self.strategyNo)
-        Utils.logger.info("strategy_" + str(self.strategyNo) + " - " +
+        Constants.logger.info("strategy_" + str(self.strategyNo) + " - " +
                           self.type + " parameters set with strike {} and premium {}".format(self.Strike,
                                                                                              self.premium), )
 
@@ -75,7 +78,7 @@ class LEG:
             else:
                 return 0
         except Exception as e:
-            Utils.logger.error("strategy_" + str(self.strategyNo) + " - " + "exception occurred {}".format(e))
+            Constants.logger.error("strategy_" + str(self.strategyNo) + " - " + "exception occurred {}".format(e))
             return self.premium
 
     def flush(self):
@@ -98,7 +101,7 @@ class LEG:
         if self.getLegUnRealizedProfit(priceDict) <= - SLMap[self.currentAdjustmentLevel][self.strategyNo] * self.premium:
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
             initialStrike = self.Strike
-            Utils.logger.info("strategy_" + str(
+            Constants.logger.info("strategy_" + str(
                 self.strategyNo) + " - " + self.type + " leg adjustment occured, initiating order placement")
             if self.currentAdjustmentLevel == Utils.noOfAdjustment:
                 threading.Thread(target=self.exit, args=(priceDict,)).start()
@@ -107,8 +110,6 @@ class LEG:
                 # self.hedge.premium = 0
                 return int(initialStrike)
             else:
-                liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
-                                     priceDict[self.symbol], self.strategyNo)
                 self.setStrike(adjustmentPercent * self.premium, None, priceDict)
                 # self.setHedge(priceDict, 20, tokenData)
                 self.currentAdjustmentLevel += 1
@@ -121,11 +122,9 @@ class LEG:
         :return:
         """
         if straddleCentre:
-            Utils.logger.info(
+            Constants.logger.info(
                 "strategy_" + str(self.strategyNo) + " - " + self.type + " leg rematch occured, initiating rematch ")
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-            liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
-                                 priceDict[self.symbol], self.strategyNo)
             symbol = self.getShonyaSymbol(str(straddleCentre))
             self.premium = 0
             self.setLegPars(symbol, priceDict)
@@ -134,46 +133,45 @@ class LEG:
             return 0
 
     def shiftIn(self, priceDict):
-        Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "shifting in initialized for " + self.type)
+        Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "shifting in initialized for " + self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-        liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
-                             priceDict[self.symbol], self.strategyNo)
         symbol = self.getShonyaSymbol(str(int(self.Strike) - Utils.shiftAmount[self.strategyNo] * self.shift))
         self.setLegPars(symbol, priceDict)
 
-    def setHedge(self, hedgeDist, client):
+    def setHedge(self, hedgeDist, priceDict):
         transactionType = "buy" if self.transactionType == "sell" else "sell"
         self.hedge = LEG(self.type, transactionType) if not self.hedge else self.hedge
         self.hedge.type = self.type
         self.hedge.exp_date = self.exp_date
-        if hedgeDist > 10:
+        if hedgeDist > 200:
             hedgestrike = str(round((int(self.Strike) + hedgeDist * self.shift) / 100) * 100)
         else:
             hedgestrike = str(int(self.Strike) + hedgeDist * self.shift)
         symbol = index + self.exp_date + hedgestrike + self.type
-        Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "hedge", end=" ")
-        self.hedge.setLegPars(symbol, client)
+        Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "moving hedge to distance {}".format(hedgeDist))
+        self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(priceDict)
+        self.hedge.setLegPars(symbol, priceDict)
 
     def updatePremium(self, priceDict):
-        Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "updating premium for " + self.symbol)
+        Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "updating premium for " + self.symbol)
         self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
         self.premium = priceDict[self.symbol]
-        if self.hedge:
-            self.hedge.updatePremium(priceDict)
+        # if self.hedge:
+        #     self.hedge.updatePremium(priceDict)
 
     def exit(self, priceDict):
         if not self.premium:
             return
-        Utils.logger.info("strategy_" + str(self.strategyNo) + " - " + "exiting leg")
+        Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "exiting leg")
         liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
                              priceDict[self.symbol], self.strategyNo)
         self.premium = 0
         if self.hedge:
             self.hedge.exit(priceDict)
 
-    def getShonyaSymbol(self, strike=None):
+    def getShonyaSymbol(self, strike=None, distFromStrike=None):
         if not strike:
-            strike = self.Strike
+            strike = self.Strike if not distFromStrike else str(int(self.Strike)+distFromStrike*self.shift)
         map = {"O": 10, "N": 11, "D": 12}
         if self.exp_date[2].isnumeric():
             m = int(self.exp_date[2]) if self.exp_date[2] not in map else map[self.exp_date[2]]

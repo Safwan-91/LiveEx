@@ -17,7 +17,7 @@ users = {
         "secret": "9fbf6b797b8f967d04b427fee8d16886",
         "2fa": "34477UN26JMYE35NU3DLT4M7LU464267",
         "imei": "abc1234",
-        "strategies": [0, 1, 2, 3, 4, 5]
+        "strategies": [0, 2]
     },
     "fathima": {
         "broker": "kotakNeo",
@@ -26,7 +26,7 @@ users = {
         "mobilenumber": "9037265906",
         "password": "LasFath@12",
         "mpin": "123456",
-        "strategies": [0, 1, ]
+        "strategies": [0, 2]
     },
     "stxo": {
         "broker": "stxo"
