@@ -8,8 +8,8 @@ from utils import liveUtils, Utils, Constants
 class Live:
     def __init__(self):
         self.mtmhit = None
-        self.expDate = Utils.expDate
-        self.strategy = [Strategy("sell", strategyNo) for strategyNo in range(6)]
+        self.expDate = Utils.parameters[0]["expDate"]
+        self.strategy = [Strategy("sell", strategyNo) for strategyNo in range(len(Utils.parameters))]
         self.positionalStrategiesLoaded = False
         self.hedge = False
 
@@ -21,25 +21,25 @@ class Live:
         if not self.positionalStrategiesLoaded:
             self.loadPositionalStrategies(priceDict)
 
-        self.start(priceDict[Utils.index], priceDict, currentime)
+        self.start(priceDict, currentime)
 
         self.checkMTMs(priceDict)
 
-        self.piyushAdjustment(priceDict[Utils.index], currentime, priceDict)
+        self.piyushAdjustment(currentime, priceDict)
 
-        if currentime == "15:25:00":
+        if currentime[:5] == "15:25":
             self.overNightHedge(priceDict)
 
-    def start(self, spot, priceDict, currentime):
-        task = [(strategy.start, (spot, priceDict, currentime)) for strategy in self.strategy]
+    def start(self, priceDict, currentime):
+        task = [(strategy.start, (priceDict, currentime)) for strategy in self.strategy]
         liveUtils.execute_in_parallel(task)
 
     def checkMTMs(self, priceDict):
         task = [(strategy.checkmtmhit, (priceDict,)) for strategy in self.strategy]
         liveUtils.execute_in_parallel(task)
 
-    def piyushAdjustment(self, spot, currentime, priceDict):
-        task = [(strategy.piyushAdjustment, (spot, currentime, priceDict)) for strategy in self.strategy]
+    def piyushAdjustment(self,currentime, priceDict):
+        task = [(strategy.piyushAdjustment, (currentime, priceDict)) for strategy in self.strategy]
         liveUtils.execute_in_parallel(task)
 
     def loadPositionalStrategies(self, priceDict):
@@ -52,8 +52,8 @@ class Live:
         self.positionalStrategiesLoaded = True
 
     def overNightHedge(self, priceDict):
-        if datetime.now().strftime("%d") != Utils.expDate[2]:
-            return
         task = [(strategy.buyOverNightHedge, (priceDict,)) for strategy in self.strategy]
         liveUtils.execute_in_parallel(task)
+        for strategy in self.strategy:
+            liveUtils.dumpObject(strategy, "strategy_"+str(strategy.strategyNo))
 

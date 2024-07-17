@@ -3,7 +3,6 @@ import threading
 from datetime import date
 
 from utils import liveUtils, Utils, Constants
-from utils.Utils import *
 
 
 def getOppTransaction(transactionType):
@@ -16,12 +15,12 @@ class LEG:
         self.type = type
         self.transactionType = transactionType
         self.Strike = None
-        self.exp_date = Utils.expDate
+        self.exp_date = Utils.parameters[strategyNo]["expDate"]
         self.symbol = None
         self.premium = None
         self.currentAdjustmentLevel = 0
         self.realizedProfit = 0
-        self.shift = strikeDifference if type == "CE" else -strikeDifference
+        self.shift = Utils.parameters[strategyNo]["strikeDifference"] if type == "CE" else -Utils.parameters[strategyNo]["strikeDifference"]
         self.hedge = None
         self.strategyNo = strategyNo
 
@@ -53,7 +52,7 @@ class LEG:
         if self.symbol:
             liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), getOppTransaction(self.transactionType),
                                  priceDict[self.symbol], self.strategyNo)
-        self.Strike = symbol[-5:] if Utils.index not in ["SENSEX", "BANKEX"] else symbol[-7:-2]
+        self.Strike = symbol[-5:] if self.getPar("index") not in ["SENSEX", "BANKEX"] else symbol[-7:-2]
         if self.transactionType == "sell" and not self.symbol:
             self.setHedge(20, priceDict)
         self.symbol = symbol
@@ -93,24 +92,22 @@ class LEG:
     def reExecute(self, priceDict):
         """
         when the current leg hits SL we do an adjustment in the leg to a farther strike
-        :param client:
         :param priceDict:
-        :param tokenData:
         :return:
         """
-        if self.getLegUnRealizedProfit(priceDict) <= - SLMap[self.currentAdjustmentLevel][self.strategyNo] * self.premium:
+        if self.getLegUnRealizedProfit(priceDict) <= - self.getPar("SLMap")[self.currentAdjustmentLevel] * self.premium:
             self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
             initialStrike = self.Strike
             Constants.logger.info("strategy_" + str(
                 self.strategyNo) + " - " + self.type + " leg adjustment occured, initiating order placement")
-            if self.currentAdjustmentLevel == Utils.noOfAdjustment:
+            if self.currentAdjustmentLevel == self.getPar("noOfAdjustment"):
                 threading.Thread(target=self.exit, args=(priceDict,)).start()
                 self.currentAdjustmentLevel += 1
                 # self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(client)
                 # self.hedge.premium = 0
                 return int(initialStrike)
             else:
-                self.setStrike(adjustmentPercent * self.premium, None, priceDict)
+                self.setStrike(self.getPar("adjustmentPercent") * self.premium, None, priceDict)
                 # self.setHedge(priceDict, 20, tokenData)
                 self.currentAdjustmentLevel += 1
                 return int(initialStrike)
@@ -135,19 +132,15 @@ class LEG:
     def shiftIn(self, priceDict):
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "shifting in initialized for " + self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-        symbol = self.getShonyaSymbol(str(int(self.Strike) - Utils.shiftAmount[self.strategyNo] * self.shift))
+        symbol = self.getShonyaSymbol(str(int(self.Strike) - self.getPar("shiftAmount")*priceDict[self.getPar("index")] * self.shift))
         self.setLegPars(symbol, priceDict)
 
     def setHedge(self, hedgeDist, priceDict):
         transactionType = "buy" if self.transactionType == "sell" else "sell"
-        self.hedge = LEG(self.type, transactionType) if not self.hedge else self.hedge
+        self.hedge = LEG(self.type, transactionType, self.strategyNo) if not self.hedge else self.hedge
         self.hedge.type = self.type
         self.hedge.exp_date = self.exp_date
-        if hedgeDist > 200:
-            hedgestrike = str(round((int(self.Strike) + hedgeDist * self.shift) / 100) * 100)
-        else:
-            hedgestrike = str(int(self.Strike) + hedgeDist * self.shift)
-        symbol = index + self.exp_date + hedgestrike + self.type
+        symbol = self.getShonyaSymbol(distFromStrike=hedgeDist)
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "moving hedge to distance {}".format(hedgeDist))
         self.hedge.realizedProfit += self.hedge.getLegUnRealizedProfit(priceDict)
         self.hedge.setLegPars(symbol, priceDict)
@@ -178,10 +171,13 @@ class LEG:
             expDate = self.exp_date[-2:] + calendar.month_abbr[m].upper() + self.exp_date[:2]
         else:
             expDate = str(date.today().day) + self.exp_date[-3:] + self.exp_date[:2]
-        return Utils.index + expDate + self.type[
-            0] + strike if Utils.index not in ["SENSEX", "BANKEX"] else Utils.index + self.exp_date + strike + self.type
+        return self.getPar("index") + expDate + self.type[
+            0] + strike if self.getPar("index") not in ["SENSEX", "BANKEX"] else self.getPar("index") + self.exp_date + strike + self.type
 
     def getSymbol(self, strike=None):
         if not strike:
             strike = self.Strike
-        return Utils.index + self.exp_date + strike + self.type
+        return self.getPar("index") + self.exp_date + strike + self.type
+    
+    def getPar(self, parameter):
+        return Utils.parameters[self.strategyNo][parameter]

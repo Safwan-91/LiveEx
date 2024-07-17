@@ -13,17 +13,17 @@ def getQuote(symbol, stxoSymbol, priceDict):
     tryNo = 0
     while tryNo <= 5:
         try:
-            users[0].client.IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
+            users[0].client.IB_Subscribe(Utils.parameters[0]["fnoExchange"], stxoSymbol, "")
             if symbol not in priceDict["addons"]:
                 priceDict["addons"].append(symbol)
             time.sleep(0.1)
             # Constants.logger.debug("strategy_"+str(self.strategyNo)+" - "+"fetching quote for {} for {}th try".format(symbol, tryNo))
-            ltp = users[0].client.IB_LTP(Utils.fnoExchange, stxoSymbol, "")
+            ltp = users[0].client.IB_LTP(Utils.parameters[0]["fnoExchange"], stxoSymbol, "")
             Constants.logger.debug("strategy_" + " - " + "quote fetched with ltp " + str(ltp))
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
             if ltp == 0:
                 Constants.logger.debug("strategy_" + " - " + "get quote attempt failed " + str(ltp))
-                users[0].client.IB_Subscribe(Utils.fnoExchange, stxoSymbol, "")
+                users[0].client.IB_Subscribe(Utils.parameters[0]["fnoExchange"], stxoSymbol, "")
                 tryNo += 1
                 time.sleep(0.5)
                 continue
@@ -37,10 +37,13 @@ def getQuote(symbol, stxoSymbol, priceDict):
 
 
 def placeOrder(shonyaSymbol, instrument_symbol, transaction_type, premium, strategyNo):
-    Constants.logger.info("strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
-                                                                                                     instrument_symbol,
-                                                                                                     premium))
-    task = [(user.placeAndConfirmOrder, (shonyaSymbol, instrument_symbol, transaction_type, premium, Utils.lotSize, strategyNo)) for user in users]
+    Constants.logger.info(
+        "strategy_" + str(strategyNo) + " - " + "placing {} order for {} at {}".format(transaction_type,
+                                                                                       instrument_symbol,
+                                                                                       premium))
+    task = [(user.placeAndConfirmOrder,
+             (shonyaSymbol, instrument_symbol, transaction_type, premium, Utils.parameters[strategyNo]["lotSize"],
+              strategyNo)) for user in users]
     execute_in_parallel(task)
 
 
@@ -61,23 +64,25 @@ def execute_in_parallel(funcs_and_args):
 
 
 def getShonyaSymbol(strike, exp_date, type):
-
     map = {"O": 10, "N": 11, "D": 12}
     if exp_date[-1].isnumeric():
         m = int(exp_date[2]) if exp_date[2] not in map else map[exp_date[2]]
         expDate = exp_date[-2:] + calendar.month_abbr[m].upper() + exp_date[:2]
     else:
-        expDate = str(date.today().day) + Utils.expDate[-3:] + Utils.expDate[:2]
-    return Utils.index + expDate + type[
-        0] + strike if Utils.index not in ["SENSEX", "BANKEX"] else Utils.index + exp_date + strike + type
+        expDate = str(date.today().day) + exp_date[-3:] + exp_date[:2]
+    return Utils.parameters[0]["index"] + expDate + type[
+        0] + strike if Utils.parameters[0]["index"] not in ["SENSEX", "BANKEX"] else Utils.parameters[0][
+                                                                                         "index"] + exp_date + strike + type
 
-def dumpObject(obj,name):
-    fileObj = open(name+'.obj', 'wb')
-    pickle.dump(obj,fileObj)
+
+def dumpObject(obj, name):
+    fileObj = open(Constants.positionalObjectsPath + "\\" + name + '.obj', 'wb')
+    pickle.dump(obj, fileObj)
     fileObj.close()
 
+
 def loadObject(name):
-    dbfile = open(name+'.obj', 'rb')
+    dbfile = open(Constants.positionalObjectsPath + "\\" + name, 'rb')
     db = pickle.load(dbfile)
     dbfile.close()
     return db

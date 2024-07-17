@@ -10,4 +10,6 @@ console_handler.setFormatter(logging.Formatter(formatter))
 logger.addHandler(console_handler)
 
 lotQuantityMap = {"MIDCPNIFTY": 10, "FINNIFTY": 40, "BANKNIFTY": 15, "NIFTY": 25, "SENSEX": 10, "BANKEX": 15}
-positionalObjectsPath = "C:\Users\Safwan PC\PycharmProjects\LiveExe\positionalObjects"
+indexTokenMap = {"MIDCPNIFTY": "26074", "FINNIFTY": "26037", "BANKNIFTY": "26009", "NIFTY": "26000", "SENSEX": "1", "BANKEX": "12"}
+lotSizeMap = {"MIDCPNIFTY": 1, "FINNIFTY": 3, "BANKNIFTY": 3, "NIFTY": 4, "SENSEX": 3, "BANKEX": 3}
+positionalObjectsPath = r"C:\Users\Safwan PC\PycharmProjects\LiveExe2\positionalObjects"

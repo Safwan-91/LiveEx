@@ -2,7 +2,7 @@ import time
 
 from ioUtils.PriceStream import PriceStream
 
-from utils import Utils
+from utils import Constants
 from core.runLive import Live
 from datetime import datetime
 
@@ -15,7 +15,7 @@ def runStrategy(priceDict):
 
 
 def main():
-    Utils.logger.info("Starting the program")
+    Constants.logger.info("Starting the program")
     priceStream = PriceStream()
     priceStream.connect()
     time.sleep(10)

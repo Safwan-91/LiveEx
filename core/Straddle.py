@@ -1,6 +1,5 @@
 from core.Leg import LEG
 from utils import Utils, liveUtils, Constants
-from utils.Utils import initialPremium
 
 
 class STRADDLE:
@@ -16,12 +15,13 @@ class STRADDLE:
     def getProfit(self, priceDict):
         return self.ce.getLegProfit(priceDict) + self.pe.getLegProfit(priceDict)
 
-    def setupStraddle(self, spot, priceDict):
-        Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "setting up initial position at " + str(spot))
-        atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
+    def setupStraddle(self, index, priceDict):
+        Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "setting up initial position at " + str(priceDict[index]))
+        atm = (round(float(priceDict[index]) / self.getPar("strikeDifference")) * self.getPar("strikeDifference"))
+        initialPremium = self.getPar("initialPremiumMultiplier")*priceDict[self.getPar("index")]
         liveUtils.execute_in_parallel([(self.ce.setStrike, (initialPremium, atm, priceDict)), (self.pe.setStrike, (initialPremium, atm, priceDict))])
         self.strikeStack = []
-        self.mean.append(spot)
+        self.mean.append(priceDict[index])
 
     def adjust(self, spot, priceDict):
         cestrike = self.ce.reExecute(priceDict) if self.pe.currentAdjustmentLevel == 0 else 0
@@ -29,12 +29,12 @@ class STRADDLE:
         if cestrike:
             self.strikeStack.append(cestrike)
             self.mean.append(spot)
-            if Utils.adjustmentShift and self.ce.currentAdjustmentLevel == 2:
+            if self.getPar("adjustmentShift") and self.ce.currentAdjustmentLevel == 2:
                 self.pe.shiftIn(priceDict)
         elif pestrike:
             self.strikeStack.append(pestrike)
             self.mean.append(spot)
-            if Utils.adjustmentShift and self.pe.currentAdjustmentLevel == 2:
+            if self.getPar("adjustmentShift") and self.pe.currentAdjustmentLevel == 2:
                 self.ce.shiftIn(priceDict)
 
     def reEnter(self, spot, priceDict):
@@ -69,3 +69,6 @@ class STRADDLE:
             symbols.append(self.pe.getShonyaSymbol(distFromStrike=6))
             symbols.append(self.pe.getShonyaSymbol(distFromStrike=20))
         return symbols
+
+    def getPar(self, parameter):
+        return Utils.parameters[self.strategyNo][parameter]
