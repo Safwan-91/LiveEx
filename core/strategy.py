@@ -8,6 +8,7 @@ from utils import liveUtils, Utils, Constants
 class Strategy:
 
     def __init__(self, transactionType, strategyNo):
+        self.index = Utils.parameters[strategyNo]["index"]
         self.overNightHedge = False
         self.mtmhit = None
         self.strategyNo = strategyNo
@@ -17,15 +18,15 @@ class Strategy:
         self.started = False
         self.isPositional = Utils.parameters[strategyNo]["isPositional"]
 
-    def start(self, spot, priceDict, currentime):
-        if self.started or currentime < Utils.startTime[self.strategyNo] or getDateDifference(getDateDifference(Utils.parameters[self.strategyNo]["expDate"]) > Utils.parameters[self.strategyNo]["expDate"]):
+    def start(self, priceDict, currentime):
+        if self.started or currentime < self.getPar("startTime") or (getDateDifference(self.getPar("expDate")) == self.getPar("daysBeforeExpiry")):
             if self.overNightHedge and self.isPositional and currentime >= "09:20:00":
                 self.straddle.setHedge(20, priceDict)
                 self.overNightHedge = False
-            pass
+            return
 
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "trade started")
-        self.straddle.setupStraddle(spot, priceDict)
+        self.straddle.setupStraddle(self.index, priceDict)
         Constants.logger.info(
             "strategy_" + str(self.strategyNo) + " - " + "straddle mean is " + str(self.straddle.mean))
         self.started = True
@@ -36,11 +37,11 @@ class Strategy:
         # self.started = False
         return self.straddle.exit(priceDict)
 
-    def piyushAdjustment(self, spot, currentTime, priceDict):
+    def piyushAdjustment(self, currentTime, priceDict):
         if self.mtmhit or not self.started:
             return
         Constants.logger.info(
-            "strategy_" + str(self.strategyNo) + " - " + "checking for piyush adjustment, spot is " + str(spot))
+            "strategy_" + str(self.strategyNo) + " - " + "checking for piyush adjustment, spot is " + str(priceDict[self.index]))
         if int(currentTime[3:5]) % 10 == 0:
             Constants.logger.info("strategy_" + str(self.strategyNo) + " - " +
                                   "mtm is {} ce premium is {}, pe premium is {}".format(
@@ -50,17 +51,17 @@ class Strategy:
             Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "ce adjustment level - " + str(
                 self.straddle.ce.currentAdjustmentLevel) + " pe adjustment level - " + str(
                 self.straddle.pe.currentAdjustmentLevel))
-        if Utils.oneSideFullHitFlag and (
-                self.straddle.pe.currentAdjustmentLevel == Utils.noOfAdjustment + 1 or self.straddle.ce.currentAdjustmentLevel == Utils.noOfAdjustment + 1):
+        if self.getPar("oneSideFullHitFlag") and (
+                self.straddle.pe.currentAdjustmentLevel == self.getPar("noOfAdjustment") + 1 or self.straddle.ce.currentAdjustmentLevel == self.getPar("noOfAdjustment") + 1):
             return
-        self.straddle.reEnter(spot, priceDict)
-        self.straddle.adjust(spot, priceDict)
+        self.straddle.reEnter(priceDict[self.index], priceDict)
+        self.straddle.adjust(priceDict[self.index], priceDict)
         Constants.logger.info("strategy_" + str(
             self.strategyNo) + " - " + "piyush adjustment check and adjustments if any done successfully")
 
     def checkmtmhit(self, priceDict):
         if self.mtmhit or (self.started and (
-                self.straddle.getProfit(priceDict) < -Utils.mtmStopLoss)):
+                self.straddle.getProfit(priceDict) < -self.getPar("mtmStopLoss"))):
             if not self.mtmhit:
                 self.mtmhit = (self.straddle.getProfit(priceDict))
                 self.end(priceDict)
@@ -72,21 +73,27 @@ class Strategy:
 
     def buyHedge(self, priceDict):
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "buying Hedge")
-        spot = priceDict[Utils.index]
-        atm = (round(float(spot) / Utils.strikeDifference) * Utils.strikeDifference)
-        symbolce = Utils.index + Utils.expDate + str(int(atm) + Utils.hedgeDist * Utils.strikeDifference) + "CE"
-        symbolpe = Utils.index + Utils.expDate + str(int(atm) - Utils.hedgeDist * Utils.strikeDifference) + "PE"
-        shonyaSymbolce = liveUtils.getShonyaSymbol(str(int(atm) + Utils.hedgeDist * Utils.strikeDifference),
-                                                   Utils.expDate, "CE")
-        shonyaSymbolpe = liveUtils.getShonyaSymbol(str(int(atm) - Utils.hedgeDist * Utils.strikeDifference),
-                                                   Utils.expDate, "PE")
+        spot = priceDict[self.getPar("index")]
+        atm = (round(float(spot) / self.getPar("strikeDifference")) * self.getPar("strikeDifference"))
+        symbolce = self.getPar("index") + self.getPar("expDate") + str(int(atm) + self.getPar("hedgeDist") * self.getPar("strikeDifference")) + "CE"
+        symbolpe = self.getPar("index") + self.getPar("expDate") + str(int(atm) - self.getPar("hedgeDist") * self.getPar("strikeDifference")) + "PE"
+        shonyaSymbolce = liveUtils.getShonyaSymbol(str(int(atm) + self.getPar("hedgeDist") * self.getPar("strikeDifference")),
+                                                   self.getPar("expDate"), "CE")
+        shonyaSymbolpe = liveUtils.getShonyaSymbol(str(int(atm) - self.getPar("hedgeDist") * self.getPar("strikeDifference")),
+                                                   self.getPar("expDate"), "PE")
         liveUtils.placeOrder(shonyaSymbolce, symbolce, "buy", 0, self.strategyNo)
         liveUtils.placeOrder(shonyaSymbolpe, symbolpe, "buy", 0, self.strategyNo)
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "hedge bought successfully")
 
     def buyOverNightHedge(self, priceDict):
-        self.straddle.setHedge(6, priceDict)
+        if datetime.now().strftime("%d") == self.getPar("expDate")[2]:
+            return
+        Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "buying overnight hedge")
+        self.straddle.setHedge(self.getPar("overNightHedgeDist"), priceDict)
         self.overNightHedge = True
+        
+    def getPar(self, parameter):
+        return Utils.parameters[self.strategyNo][parameter]
 
 
 def getDateDifference(date):

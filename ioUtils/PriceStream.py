@@ -6,7 +6,6 @@ class PriceStream:
     def __init__(self):
         self.api = Shonya(client_id='def').login()
         self.feedStarted = False
-        self.expDate = Utils.expDate
         self.priceDict = {}
         self.tickSymbolMap = {}
         self.l = []
@@ -18,17 +17,17 @@ class PriceStream:
             try:
 
                 if not self.feedStarted:
-                    self.tickSymbolMap[tick_data["tk"]] = Utils.index
+                    self.tickSymbolMap[tick_data["tk"]] = Utils.parameters[0]["index"]
                     self.priceDict["addons"] = []
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
-                    atm = int(round(float(tick_data["lp"]) / Utils.strikeDifference) * Utils.strikeDifference)
-                    for i in range(-2,12):
-                        symbolce = liveUtils.getShonyaSymbol(str(atm + i * Utils.strikeDifference), Utils.expDate, "CE")
-                        symbolpe = liveUtils.getShonyaSymbol(str(atm - i * Utils.strikeDifference), Utils.expDate, "PE")
-                        tokence = self.api.searchscrip(Utils.fnoExchange, symbolce)["values"][0]["token"]
-                        tokenpe = self.api.searchscrip(Utils.fnoExchange, symbolpe)["values"][0]["token"]
-                        self.l.append(Utils.fnoExchange + '|' + tokence)
-                        self.l.append(Utils.fnoExchange + '|' + tokenpe)
+                    atm = int(round(float(tick_data["lp"]) / Utils.parameters[0]["strikeDifference"]) * Utils.parameters[0]["strikeDifference"])
+                    for i in range(-2,25):
+                        symbolce = liveUtils.getShonyaSymbol(str(atm + i * Utils.parameters[0]["strikeDifference"]), Utils.parameters[0]["expDate"], "CE")
+                        symbolpe = liveUtils.getShonyaSymbol(str(atm - i * Utils.parameters[0]["strikeDifference"]), Utils.parameters[0]["expDate"], "PE")
+                        tokence = self.api.searchscrip(Utils.parameters[0]["fnoExchange"], symbolce)["values"][0]["token"]
+                        tokenpe = self.api.searchscrip(Utils.parameters[0]["fnoExchange"], symbolpe)["values"][0]["token"]
+                        self.l.append(Utils.parameters[0]["fnoExchange"] + '|' + tokence)
+                        self.l.append(Utils.parameters[0]["fnoExchange"] + '|' + tokenpe)
                         self.tickSymbolMap[tokence] = symbolce
                         self.tickSymbolMap[tokenpe] = symbolpe
                     self.feedStarted = True
@@ -42,10 +41,10 @@ class PriceStream:
                 while len(self.priceDict["addons"]) != 0:
                     Constants.logger.debug("inside subscribing addons for " + self.priceDict["addons"][-1])
                     symbol = self.priceDict["addons"].pop()
-                    token = self.api.searchscrip(Utils.fnoExchange, symbol)["values"][0][
+                    token = self.api.searchscrip(Utils.parameters[0]["fnoExchange"], symbol)["values"][0][
                         "token"]
                     self.tickSymbolMap[token] = symbol
-                    self.api.subscribe(Utils.fnoExchange + '|' + token)
+                    self.api.subscribe(Utils.parameters[0]["fnoExchange"] + '|' + token)
 
             except Exception as e:
                 Constants.logger.error("Exception in price feed - {}".format(e))
@@ -56,6 +55,6 @@ class PriceStream:
                 self.api.subscribe(self.l)
                 Constants.logger.debug("all subscribed")
             self.api.subscribe(
-                Utils.indexExchange + '|' + Utils.indexToken)
+                Utils.parameters[0]["indexExchange"] + '|' + Constants.indexTokenMap[Utils.parameters[0]["index"]])
 
         self.api.start_websocket(subscribe_callback=event_handler_feed_update, socket_open_callback=open_callback)
