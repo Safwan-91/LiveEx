@@ -63,11 +63,13 @@ class STRADDLE:
     def getAllSymbols(self):
         symbols = [self.ce.getShonyaSymbol(), self.pe.getShonyaSymbol()]
         if self.ce.hedge:
-            symbols.append(self.ce.getShonyaSymbol(distFromStrike=6))
-            symbols.append(self.ce.getShonyaSymbol(distFromStrike=20))
+            symbols.append(self.ce.getShonyaSymbol())
+            symbols.append(self.ce.getShonyaSymbol(distFromStrike=self.getPar("overNightHedgeDist")))
+            symbols.append(self.ce.getShonyaSymbol(distFromStrike=self.getPar("hedgeDist")))
         if self.pe.hedge:
-            symbols.append(self.pe.getShonyaSymbol(distFromStrike=6))
-            symbols.append(self.pe.getShonyaSymbol(distFromStrike=20))
+            symbols.append(self.pe.getShonyaSymbol())
+            symbols.append(self.pe.getShonyaSymbol(distFromStrike=self.getPar("overNightHedgeDist")))
+            symbols.append(self.pe.getShonyaSymbol(distFromStrike=self.getPar("hedgeDist")))
         return symbols
 
     def getPar(self, parameter):
