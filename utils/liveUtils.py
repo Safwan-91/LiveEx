@@ -63,16 +63,15 @@ def execute_in_parallel(funcs_and_args):
         thread.join()
 
 
-def getShonyaSymbol(strike, exp_date, type):
+def getShonyaSymbol(index, strike, exp_date, type):
     map = {"O": 10, "N": 11, "D": 12}
     if exp_date[-1].isnumeric():
         m = int(exp_date[2]) if exp_date[2] not in map else map[exp_date[2]]
         expDate = exp_date[-2:] + calendar.month_abbr[m].upper() + exp_date[:2]
     else:
         expDate = str(date.today().day) + exp_date[-3:] + exp_date[:2]
-    return Utils.parameters[0]["index"] + expDate + type[
-        0] + strike if Utils.parameters[0]["index"] not in ["SENSEX", "BANKEX"] else Utils.parameters[0][
-                                                                                         "index"] + exp_date + strike + type
+    return index + expDate + type[
+        0] + strike if index not in ["SENSEX", "BANKEX"] else index + exp_date + strike + type
 
 
 def dumpObject(obj, name):
