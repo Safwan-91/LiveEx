@@ -1,3 +1,4 @@
+import os
 import time
 from datetime import datetime
 
@@ -19,9 +20,9 @@ class Strategy:
         self.isPositional = Utils.parameters[strategyNo]["isPositional"]
 
     def start(self, priceDict, currentime):
-        if self.started or currentime < self.getPar("startTime") or (getDateDifference(self.getPar("expDate")) == self.getPar("daysBeforeExpiry")):
-            if self.overNightHedge and self.isPositional and currentime >= "09:20:00":
-                self.straddle.setHedge(20, priceDict)
+        if self.started or currentime < self.getPar("startTime") or (getDateDifference(self.getPar("expDate")) != self.getPar("daysBeforeExpiry")):
+            if self.overNightHedge and self.isPositional and "09:20:00" <= currentime <= Constants.positionalEndTime:
+                self.straddle.setHedge(self.getPar("hedgeDist"), priceDict)
                 self.overNightHedge = False
             return
 
@@ -61,7 +62,7 @@ class Strategy:
 
     def checkmtmhit(self, priceDict):
         if self.mtmhit or (self.started and (
-                self.straddle.getProfit(priceDict) < -self.getPar("mtmStopLoss"))):
+                self.straddle.getProfit(priceDict) < -self.getPar("mtmStopLoss") * priceDict[self.getPar("index")])):
             if not self.mtmhit:
                 self.mtmhit = (self.straddle.getProfit(priceDict))
                 self.end(priceDict)
@@ -86,7 +87,10 @@ class Strategy:
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "hedge bought successfully")
 
     def buyOverNightHedge(self, priceDict):
+        if not self.started or not self.getPar("isPositional") or self.getPar("hedgeDist") == self.getPar("overNightHedgeDist"):
+            return
         if datetime.now().strftime("%d") == self.getPar("expDate")[2]:
+            os.remove(Constants.positionalObjectsPath + "\\" + "strategy_" + str(self.strategyNo))
             return
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "buying overnight hedge")
         self.straddle.setHedge(self.getPar("overNightHedgeDist"), priceDict)
@@ -97,8 +101,8 @@ class Strategy:
 
 
 def getDateDifference(date):
-    day = int(date[:2])
-    year = int(date[3:])
+    year = int("20"+date[:2])
+    day = int(date[3:])
     month = int(date[2:3])
     date_object = datetime(year, month, day)
-    return (date_object - datetime.now()).days
+    return (date_object - datetime.now()).days + 1
