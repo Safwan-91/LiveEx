@@ -18,7 +18,7 @@ def main():
     Constants.logger.info("Starting the program")
     priceStream = PriceStream()
     priceStream.connect()
-    time.sleep(10)
+    time.sleep(30)
     while True:
         # current_time = datetime.now()
         # sleep_time = 60 - current_time.second - (current_time.microsecond / 1000000.0)

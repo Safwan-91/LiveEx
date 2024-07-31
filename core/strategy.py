@@ -78,9 +78,9 @@ class Strategy:
         atm = (round(float(spot) / self.getPar("strikeDifference")) * self.getPar("strikeDifference"))
         symbolce = self.getPar("index") + self.getPar("expDate") + str(int(atm) + self.getPar("hedgeDist") * self.getPar("strikeDifference")) + "CE"
         symbolpe = self.getPar("index") + self.getPar("expDate") + str(int(atm) - self.getPar("hedgeDist") * self.getPar("strikeDifference")) + "PE"
-        shonyaSymbolce = liveUtils.getShonyaSymbol(str(int(atm) + self.getPar("hedgeDist") * self.getPar("strikeDifference")),
+        shonyaSymbolce = liveUtils.getShonyaSymbol(self.getPar("index"), str(int(atm) + self.getPar("hedgeDist") * self.getPar("strikeDifference")),
                                                    self.getPar("expDate"), "CE")
-        shonyaSymbolpe = liveUtils.getShonyaSymbol(str(int(atm) - self.getPar("hedgeDist") * self.getPar("strikeDifference")),
+        shonyaSymbolpe = liveUtils.getShonyaSymbol(self.getPar("index"), str(int(atm) - self.getPar("hedgeDist") * self.getPar("strikeDifference")),
                                                    self.getPar("expDate"), "PE")
         liveUtils.placeOrder(shonyaSymbolce, symbolce, "buy", 0, self.strategyNo)
         liveUtils.placeOrder(shonyaSymbolpe, symbolpe, "buy", 0, self.strategyNo)
