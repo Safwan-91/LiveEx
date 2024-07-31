@@ -13,6 +13,7 @@ logger.addHandler(console_handler)
 lotQuantityMap = {"MIDCPNIFTY": 10, "FINNIFTY": 40, "BANKNIFTY": 15, "NIFTY": 25, "SENSEX": 10, "BANKEX": 15}
 indexTokenMap = {"MIDCPNIFTY": "26074", "FINNIFTY": "26037", "BANKNIFTY": "26009", "NIFTY": "26000", "SENSEX": "1",
                  "BANKEX": "12"}
+strikeDiffMap = {"MIDCPNIFTY": 25, "FINNIFTY": 50, "BANKNIFTY": 100, "NIFTY": 50, "SENSEX": 100, "BANKEX": 100}
 tokenIndexMap = {"26074": "MIDCPNIFTY", "26037": "FINNIFTY", "26009": "BANKNIFTY", "26000": "NIFTY", "1": "SENSEX",
                  "12": "BANKEX"}
 
