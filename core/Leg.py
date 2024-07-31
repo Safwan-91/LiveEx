@@ -54,7 +54,7 @@ class LEG:
                                  priceDict[self.symbol], self.strategyNo)
         self.Strike = symbol[-5:] if self.getPar("index") not in ["SENSEX", "BANKEX"] else symbol[-7:-2]
         if self.transactionType == "sell" and not self.symbol:
-            self.setHedge(20, priceDict)
+            self.setHedge(self.getPar("hedgeDist"), priceDict)
         self.symbol = symbol
         self.premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(), priceDict)
         liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), self.transactionType, self.premium, self.strategyNo)
@@ -77,7 +77,7 @@ class LEG:
             else:
                 return 0
         except Exception as e:
-            Constants.logger.error("strategy_" + str(self.strategyNo) + " - " + "exception occurred {}".format(e))
+            Constants.logger.error("strategy_" + str(self.strategyNo) + " - " + "exception occurred while getting price from priceDict {}".format(e))
             return self.premium
 
     def flush(self):
@@ -130,12 +130,15 @@ class LEG:
             return 0
 
     def shiftIn(self, priceDict):
+        shiftAmount = round(self.getPar("shiftAmount")*priceDict[self.getPar("index")]) * self.shift
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "shifting in initialized for " + self.type)
         self.realizedProfit += self.getLegUnRealizedProfit(priceDict)
-        symbol = self.getShonyaSymbol(str(int(self.Strike) - self.getPar("shiftAmount")*priceDict[self.getPar("index")] * self.shift))
+        symbol = self.getShonyaSymbol(str(int(self.Strike) - shiftAmount))
         self.setLegPars(symbol, priceDict)
 
     def setHedge(self, hedgeDist, priceDict):
+        if not self.premium:
+            return
         transactionType = "buy" if self.transactionType == "sell" else "sell"
         self.hedge = LEG(self.type, transactionType, self.strategyNo) if not self.hedge else self.hedge
         self.hedge.type = self.type
@@ -177,6 +180,8 @@ class LEG:
     def getSymbol(self, strike=None):
         if not strike:
             strike = self.Strike
+        if Utils.isMonthly and self.getPar("isPositional"):
+            return self.getPar("index") + self.getPar("expDate")[:2] + calendar.month_name[Constants.monthMap[int(self.getPar("expDate")[2])]][:3].upper() + strike + self.type
         return self.getPar("index") + self.exp_date + strike + self.type
     
     def getPar(self, parameter):

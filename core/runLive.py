@@ -27,7 +27,7 @@ class Live:
 
         self.piyushAdjustment(currentime, priceDict)
 
-        if currentime[:5] == "15:25":
+        if currentime[:5] == Constants.positionalEndTime:
             self.overNightHedge(priceDict)
 
     def start(self, priceDict, currentime):
@@ -55,5 +55,6 @@ class Live:
         task = [(strategy.buyOverNightHedge, (priceDict,)) for strategy in self.strategy]
         liveUtils.execute_in_parallel(task)
         for strategy in self.strategy:
-            liveUtils.dumpObject(strategy, "strategy_"+str(strategy.strategyNo))
+            if strategy.started and strategy.getPar("isPositional"):
+                liveUtils.dumpObject(strategy, "strategy_"+str(strategy.strategyNo))
 
