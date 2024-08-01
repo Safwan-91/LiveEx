@@ -38,7 +38,7 @@ class Shonya(object):
             self.vc = 'FA145842_U'
         else:
             self.uid = 'FA175005'
-            self.pwd = 'Strangle@27'
+            self.pwd = 'Strangle@29'
             self.factor2 = pyotp.TOTP('3ZQ64ZJ3LPSX64AL4J4MI3QGUIU527L7')
             self.imei = '60-45-CB-C5-A7-49'
             self.app_key = 'fa33bde95e69245faf636528e259083f'
