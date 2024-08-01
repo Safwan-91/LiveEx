@@ -122,7 +122,7 @@ class User:
             else:
                 tryNo += 1
         tryNo = 0
-        while tryNo <= 5:
+        while tryNo <= 10:
             try:
                 statuses = self.client.IB_OrderStatus(orderID)
                 done = True
