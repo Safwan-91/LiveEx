@@ -26,7 +26,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": False,
-        "strategyTag": "OPTIONSPLAYINTRADAY1MIN"
+        "strategyTag": "OPTIONSPLAYINTRADAY1MIN0945SL1"
     },
 {
         "SLMap": {0: 0.3, 1: 1, 2: 1},
@@ -48,7 +48,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": False,
-        "strategyTag": "OPTIONSPLAYINTRADAY1MIN"
+        "strategyTag": "OPTIONSPLAYINTRADAY1MIN0945SL2"
     },
 {
         "SLMap": {0: 0.3, 1: 1, 2: 1},
@@ -70,7 +70,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": False,
-        "strategyTag": "OPTIONSPLAYINTRADAY1MIN"
+        "strategyTag": "OPTIONSPLAYINTRADAY1MIN1015SL1"
     },
 {
         "SLMap": {0: 0.3, 1: 1, 2: 1},
@@ -92,7 +92,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": False,
-        "strategyTag": "OPTIONSPLAYINTRADAY1MIN"
+        "strategyTag": "OPTIONSPLAYINTRADAY1MIN1015SL2"
     },
 {
         "SLMap": {0: 0.3, 1: 1, 2: 1},
@@ -114,7 +114,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": False,
-        "strategyTag": "OPTIONSPLAYINTRADAY1MIN"
+        "strategyTag": "OPTIONSPLAYINTRADAY1MIN1045SL1"
     },
 {
         "SLMap": {0: 0.3, 1: 1, 2: 1},
@@ -136,7 +136,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": False,
-        "strategyTag": "OPTIONSPLAYINTRADAY1MIN"
+        "strategyTag": "OPTIONSPLAYINTRADAY1MIN1045SL2"
     },
     {
         "SLMap": {0: 0.2, 1: 1, 2: 1},
@@ -154,7 +154,7 @@ parameters = [
         "daysBeforeExpiry": 6,
         "adjustmentShift": True,
         "shiftAmount": 0.0002,
-        "startTime": "14:44:00",
+        "startTime": "09:44:00",
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": True,

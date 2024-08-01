@@ -139,6 +139,8 @@ class User:
                 Constants.logger.error(e)
                 time.sleep(1)
                 continue
+        if not done:
+            Constants.logger.error("strategy_" + str(strategyNo) + " - " + "order not completed for all users, status - {}".format(statuses))
 
 
 users = [User("stxo")]

@@ -15,8 +15,8 @@ class PriceStream:
 
     def connect(self):
         def event_handler_feed_update(tick_data):
-            print("in feed handler")
-            print(tick_data)
+            # print("in feed handler")
+            # print(tick_data)
             try:
                 if tick_data["tk"] in self.indexStrategyNoMap.keys() and self.priceDict.get(Constants.tokenIndexMap[tick_data["tk"]], 0) == 0:
                     self.tickSymbolMap[tick_data["tk"]] = Constants.tokenIndexMap[tick_data["tk"]]
