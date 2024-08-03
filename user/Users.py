@@ -123,7 +123,7 @@ class User:
                 tryNo += 1
         tryNo = 0
         while tryNo <= 10:
-            Constants.logger.debug("strategy_" + str(strategyNo) + " - " + "getting order status, tryNo - ".format(tryNo))
+            Constants.logger.debug("strategy_" + str(strategyNo) + " - " + "getting order status, tryNo - {}".format(tryNo))
             try:
                 statuses = self.client.IB_OrderStatus(orderID).split(",")
                 done = True

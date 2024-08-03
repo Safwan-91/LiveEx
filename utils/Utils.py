@@ -158,7 +158,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": True,
-        "strategyTag": "OPTIONSPLAYPOSITIONAL"
+        "strategyTag": "OPTIONSPLAYPOSITIONAL6D1"
     },
     {
         "SLMap": {0: 0.2, 1: 1, 2: 1},
@@ -180,7 +180,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": True,
-        "strategyTag": "OPTIONSPLAYPOSITIONAL"
+        "strategyTag": "OPTIONSPLAYPOSITIONAL6D2"
     },
     {
         "SLMap": {0: 0.2, 1: 1, 2: 1},
@@ -246,7 +246,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": True,
-        "strategyTag": "OPTIONSPLAYPOSITIONAL"
+        "strategyTag": "OPTIONSPLAYPOSITIONAL2D1"
     },
     {
         "SLMap": {0: 0.2, 1: 1, 2: 1},
@@ -268,7 +268,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": True,
-        "strategyTag": "OPTIONSPLAYPOSITIONAL"
+        "strategyTag": "OPTIONSPLAYPOSITIONAL2D2"
     }
 ]
 
