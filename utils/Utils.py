@@ -1,8 +1,8 @@
 from utils import Constants
 
 isMonthly = False
-intradayIndex = "NIFTY"
-intradayExpDate = "24801"
+intradayIndex = "SENSEX"
+intradayExpDate = "24802"
 positionalExpDate = "24807"
 
 parameters = [
@@ -29,7 +29,7 @@ parameters = [
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN0945SL1"
     },
 {
-        "SLMap": {0: 0.3, 1: 1, 2: 1},
+        "SLMap": {0: 0.3, 1: 2, 2: 1},
         "adjustmentPercent": 0.3,
         "initialPremiumMultiplier": 0.0025,
         "mtmStopLoss": 0.00165,
@@ -43,9 +43,9 @@ parameters = [
         "oneSideFullHitFlag": True,
         "daysBeforeExpiry": 0,
         "adjustmentShift": True,
-        "shiftAmount": 0.00005,
+        "shiftAmount": 0.00007,
         "startTime": "09:45:00",
-        "hedgeDist": 20,
+        "hedgeDist": 30,
         "overNightHedgeDist": 5,
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN0945SL2"
@@ -66,14 +66,14 @@ parameters = [
         "daysBeforeExpiry": 0,
         "adjustmentShift": True,
         "shiftAmount": 0.00005,
-        "startTime": "09:45:00",
-        "hedgeDist": 20,
+        "startTime": "10:15:00",
+        "hedgeDist": 30,
         "overNightHedgeDist": 5,
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN1015SL1"
     },
 {
-        "SLMap": {0: 0.3, 1: 1, 2: 1},
+        "SLMap": {0: 0.3, 1: 2, 2: 1},
         "adjustmentPercent": 0.3,
         "initialPremiumMultiplier": 0.0025,
         "mtmStopLoss": 0.00165,
@@ -87,9 +87,9 @@ parameters = [
         "oneSideFullHitFlag": True,
         "daysBeforeExpiry": 0,
         "adjustmentShift": True,
-        "shiftAmount": 0.00005,
-        "startTime": "09:45:00",
-        "hedgeDist": 20,
+        "shiftAmount": 0.00007,
+        "startTime": "10:15:00",
+        "hedgeDist": 30,
         "overNightHedgeDist": 5,
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN1015SL2"
@@ -110,14 +110,14 @@ parameters = [
         "daysBeforeExpiry": 0,
         "adjustmentShift": True,
         "shiftAmount": 0.00005,
-        "startTime": "09:45:00",
-        "hedgeDist": 20,
+        "startTime": "10:45:00",
+        "hedgeDist": 30,
         "overNightHedgeDist": 5,
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN1045SL1"
     },
 {
-        "SLMap": {0: 0.3, 1: 1, 2: 1},
+        "SLMap": {0: 0.3, 1: 2, 2: 1},
         "adjustmentPercent": 0.3,
         "initialPremiumMultiplier": 0.0025,
         "mtmStopLoss": 0.00165,
@@ -132,8 +132,8 @@ parameters = [
         "daysBeforeExpiry": 0,
         "adjustmentShift": True,
         "shiftAmount": 0.00005,
-        "startTime": "09:45:00",
-        "hedgeDist": 20,
+        "startTime": "10:45:00",
+        "hedgeDist": 30,
         "overNightHedgeDist": 5,
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN1045SL2"
@@ -202,7 +202,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": True,
-        "strategyTag": "OPTIONSPLAYPOSITIONAL"
+        "strategyTag": "OPTIONSPLAYPOSITIONAL5D1"
     },
     {
         "SLMap": {0: 0.2, 1: 1, 2: 1},
@@ -224,7 +224,7 @@ parameters = [
         "hedgeDist": 20,
         "overNightHedgeDist": 5,
         "isPositional": True,
-        "strategyTag": "OPTIONSPLAYPOSITIONAL"
+        "strategyTag": "OPTIONSPLAYPOSITIONAL5D2"
     },
     {
         "SLMap": {0: 0.2, 1: 1, 2: 1},
