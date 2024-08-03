@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-logPath = "C:/Users/Safwan PC/Desktop/logs/"
+logPath = "C:/Users/thanseef/Desktop/logs/"
 formatter = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(filename=logPath + datetime.now().strftime('%Y-%m-%d') + '.log', level=logging.DEBUG,
                     format=formatter)
@@ -17,6 +17,6 @@ strikeDiffMap = {"MIDCPNIFTY": 25, "FINNIFTY": 50, "BANKNIFTY": 100, "NIFTY": 50
 tokenIndexMap = {"26074": "MIDCPNIFTY", "26037": "FINNIFTY", "26009": "BANKNIFTY", "26000": "NIFTY", "1": "SENSEX",
                  "12": "BANKEX"}
 
-positionalObjectsPath = r"C:\Users\Safwan PC\PycharmProjects\LiveExe2\positionalObjects"
+positionalObjectsPath = r"C:\Users\thanseef\PycharmProjects\LiveEx_prod\positionalObjects"
 positionalEndTime = "15:25"
 monthMap = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, "O": 10, "N": 11, "D": 12}
