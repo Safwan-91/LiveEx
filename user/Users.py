@@ -123,11 +123,12 @@ class User:
                 tryNo += 1
         tryNo = 0
         while tryNo <= 10:
+            Constants.logger.debug("strategy_" + str(strategyNo) + " - " + "getting order status, tryNo - ".format(tryNo))
             try:
-                statuses = self.client.IB_OrderStatus(orderID)
+                statuses = self.client.IB_OrderStatus(orderID).split(",")
                 done = True
-                for status in statuses.split(","):
-                    if status not in ["completed", "rejected"]:
+                for status in statuses:
+                    if status not in ["cancelled", "completed", "rejected"]:
                         done = False
                         # Constants.logger.warn("strategy_" + str(strategyNo) + " - " + "order not completed with status" + statuses)
                         time.sleep(0.05)
@@ -138,8 +139,9 @@ class User:
             except Exception as e:
                 Constants.logger.error(e)
                 time.sleep(1)
+                tryNo += 1
                 continue
-        if not done:
+        if not done or "cancelled" in statuses or "rejected" in statuses:
             Constants.logger.error("strategy_" + str(strategyNo) + " - " + "order not completed for all users, status - {}".format(statuses))
 
 
