@@ -39,7 +39,7 @@ class Strategy:
         return self.straddle.exit(priceDict)
 
     def piyushAdjustment(self, currentTime, priceDict):
-        if self.mtmhit or not self.started:
+        if self.mtmhit or not self.started or self.checkHedgedStrategyMTMjump(priceDict):
             return
         Constants.logger.info(
             "strategy_" + str(self.strategyNo) + " - " + "checking for piyush adjustment, spot is " + str(priceDict[self.index]))
@@ -63,7 +63,7 @@ class Strategy:
     def checkmtmhit(self, priceDict):
         if self.mtmhit or (self.started and (
                 self.straddle.getProfit(priceDict) < -self.getPar("mtmStopLoss") * priceDict[self.getPar("index")])):
-            if not self.mtmhit:
+            if not self.mtmhit and not self.checkHedgedStrategyMTMjump(priceDict):
                 self.mtmhit = (self.straddle.getProfit(priceDict))
                 self.end(priceDict)
                 Constants.logger.info(
@@ -98,6 +98,9 @@ class Strategy:
         
     def getPar(self, parameter):
         return Utils.parameters[self.strategyNo][parameter]
+
+    def checkHedgedStrategyMTMjump(self, priceDict):
+        return self.getPar("hedgeDist") <= 4 and self.straddle.getProfit(priceDict) < -(self.getPar("mtmStopLoss") + 0.0005) * priceDict[self.getPar("index")]
 
 
 def getDateDifference(date):
