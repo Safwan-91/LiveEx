@@ -28,7 +28,7 @@ parameters = [
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN0945SL1"
     },
-{
+    {
         "SLMap": {0: 0.3, 1: 2, 2: 1},
         "adjustmentPercent": 0.3,
         "initialPremiumMultiplier": 0.0025,
@@ -50,7 +50,7 @@ parameters = [
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN0945SL2"
     },
-{
+    {
         "SLMap": {0: 0.3, 1: 1, 2: 1},
         "adjustmentPercent": 0.3,
         "initialPremiumMultiplier": 0.0025,
@@ -72,7 +72,7 @@ parameters = [
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN1015SL1"
     },
-{
+    {
         "SLMap": {0: 0.3, 1: 2, 2: 1},
         "adjustmentPercent": 0.3,
         "initialPremiumMultiplier": 0.0025,
@@ -94,7 +94,7 @@ parameters = [
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN1015SL2"
     },
-{
+    {
         "SLMap": {0: 0.3, 1: 1, 2: 1},
         "adjustmentPercent": 0.3,
         "initialPremiumMultiplier": 0.0025,
@@ -116,7 +116,7 @@ parameters = [
         "isPositional": False,
         "strategyTag": "OPTIONSPLAYINTRADAY1MIN1045SL1"
     },
-{
+    {
         "SLMap": {0: 0.3, 1: 2, 2: 1},
         "adjustmentPercent": 0.3,
         "initialPremiumMultiplier": 0.0025,
