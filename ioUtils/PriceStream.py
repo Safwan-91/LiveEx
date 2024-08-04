@@ -23,7 +23,7 @@ class PriceStream:
                     self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
                     self.getOptionList(self.indexStrategyNoMap[tick_data["tk"]])
                     self.api.subscribe(self.subscribedOptionList)
-                    Constants.logger.debug("all subscribed for {}".format(tick_data["ts"]))
+                    Constants.logger.debug("all subscribed for {}".format(Constants.tokenIndexMap[tick_data["tk"]]))
                 else:
                     if "lp" in tick_data:
                         self.priceDict[self.tickSymbolMap[tick_data["tk"]]] = float(tick_data["lp"])
@@ -32,10 +32,11 @@ class PriceStream:
                 while len(self.priceDict["addons"]) != 0:
                     Constants.logger.debug("inside subscribing addons for " + self.priceDict["addons"][-1])
                     symbol = self.priceDict["addons"].pop()
-                    token = self.api.searchscrip(Utils.parameters[0]["fnoExchange"], symbol)["values"][0][
+                    fnoExch = "BFO" if "SENSEX" in symbol or "BANKEX" in symbol else "NFO"
+                    token = self.api.searchscrip(fnoExch, symbol)["values"][0][
                         "token"]
                     self.tickSymbolMap[token] = symbol
-                    self.api.subscribe(Utils.parameters[0]["fnoExchange"] + '|' + token)
+                    self.api.subscribe(fnoExch + '|' + token)
 
             except Exception as e:
                 Constants.logger.error("Exception in price feed - {}".format(e))

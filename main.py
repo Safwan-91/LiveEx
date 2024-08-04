@@ -18,6 +18,7 @@ def main():
     Constants.logger.info("Starting the program")
     priceStream = PriceStream()
     priceStream.connect()
+    runLive.loadPositionalStrategies(priceStream.priceDict)
     time.sleep(30)
     while True:
         # current_time = datetime.now()
