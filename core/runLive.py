@@ -58,5 +58,5 @@ class Live:
         for strategy in self.strategy:
             if strategy.started and strategy.getPar("isPositional") and not self.positionalObjectsSaved:
                 liveUtils.dumpObject(strategy, "strategy_"+str(strategy.strategyNo))
-                self.positionalObjectsSaved = True
+        self.positionalObjectsSaved = True
 
