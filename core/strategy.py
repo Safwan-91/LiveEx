@@ -87,7 +87,7 @@ class Strategy:
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " + "hedge bought successfully")
 
     def buyOverNightHedge(self, priceDict):
-        if datetime.now().strftime("%d") == self.getPar("expDate")[2]:
+        if datetime.now().strftime("%d") == self.getPar("expDate")[-2:]:
             os.remove(Constants.positionalObjectsPath + "\\" + "strategy_" + str(self.strategyNo))
             return
         if not self.started or not self.getPar("isPositional") or self.getPar("hedgeDist") == self.getPar("overNightHedgeDist"):

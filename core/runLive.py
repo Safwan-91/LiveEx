@@ -9,7 +9,6 @@ class Live:
     def __init__(self):
         self.positionalObjectsSaved = False
         self.mtmhit = None
-        self.expDate = Utils.parameters[0]["expDate"]
         self.strategy = [Strategy("sell", strategyNo) for strategyNo in range(len(Utils.parameters))]
         self.positionalStrategiesLoaded = False
         self.hedge = False
@@ -56,7 +55,7 @@ class Live:
         task = [(strategy.buyOverNightHedge, (priceDict,)) for strategy in self.strategy]
         liveUtils.execute_in_parallel(task)
         for strategy in self.strategy:
-            if strategy.started and strategy.getPar("isPositional") and not self.positionalObjectsSaved:
+            if strategy.started and strategy.getPar("isPositional") and datetime.now().strftime("%d") != strategy.getPar("expDate")[-2:] and not self.positionalObjectsSaved:
                 liveUtils.dumpObject(strategy, "strategy_"+str(strategy.strategyNo))
         self.positionalObjectsSaved = True
 

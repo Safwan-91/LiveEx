@@ -8,22 +8,22 @@ from user.Users import users
 from utils import Utils, Constants
 
 
-def getQuote(symbol, stxoSymbol, priceDict):
+def getQuote(symbol, stxoSymbol, priceDict, strategyNo):
     # return 20
     tryNo = 0
     while tryNo <= 5:
         try:
-            users[0].client.IB_Subscribe(Utils.parameters[0]["fnoExchange"], stxoSymbol, "")
+            users[0].client.IB_Subscribe(Utils.parameters[strategyNo]["fnoExchange"], stxoSymbol, "")
             if symbol not in priceDict["addons"]:
                 priceDict["addons"].append(symbol)
             time.sleep(0.1)
             # Constants.logger.debug("strategy_"+str(self.strategyNo)+" - "+"fetching quote for {} for {}th try".format(symbol, tryNo))
-            ltp = users[0].client.IB_LTP(Utils.parameters[0]["fnoExchange"], stxoSymbol, "")
+            ltp = users[0].client.IB_LTP(Utils.parameters[strategyNo]["fnoExchange"], stxoSymbol, "")
             Constants.logger.debug("strategy_" + " - " + "quote fetched with ltp " + str(ltp))
             # OR Quotes API can be accessed without completing login by passing session_token, sid, and server_id
             if ltp == 0:
                 Constants.logger.debug("strategy_" + " - " + "get quote attempt failed " + str(ltp))
-                users[0].client.IB_Subscribe(Utils.parameters[0]["fnoExchange"], stxoSymbol, "")
+                users[0].client.IB_Subscribe(Utils.parameters[strategyNo]["fnoExchange"], stxoSymbol, "")
                 tryNo += 1
                 time.sleep(0.5)
                 continue
