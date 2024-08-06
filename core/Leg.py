@@ -56,7 +56,7 @@ class LEG:
         if self.transactionType == "sell" and not self.symbol:
             self.setHedge(self.getPar("hedgeDist"), priceDict)
         self.symbol = symbol
-        self.premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(), priceDict)
+        self.premium = priceDict[symbol] if symbol in priceDict else liveUtils.getQuote(symbol, self.getSymbol(), priceDict, self.strategyNo)
         liveUtils.placeOrder(self.getShonyaSymbol(), self.getSymbol(), self.transactionType, self.premium, self.strategyNo)
         Constants.logger.info("strategy_" + str(self.strategyNo) + " - " +
                           self.type + " parameters set with strike {} and premium {}".format(self.Strike,
